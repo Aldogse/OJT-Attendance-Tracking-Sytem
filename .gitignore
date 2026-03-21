@@ -1,6 +1,7 @@
+*.jfm
+*.dbmdl
 .vs/
 bin/
 obj/
 *.user
 *.suo
-*.dbmdl
