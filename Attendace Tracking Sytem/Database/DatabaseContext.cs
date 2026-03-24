@@ -12,6 +12,5 @@ namespace Attendace_Tracking_Sytem.Database
 
         public DbSet<StudentWorkProfile> StudentsWorkProfile{ get; set; }
         public DbSet<StudentProfile> StudentsProfile { get; set; }
-        public DbSet<StudentLogInCredentials> StudentLogInCredentials { get; set; }
     }
 }

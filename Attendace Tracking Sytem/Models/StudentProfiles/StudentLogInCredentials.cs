@@ -6,9 +6,8 @@ namespace Attendace_Tracking_Sytem.Models.StudentProfiles
 {
     public class StudentLogInCredentials: IdentityUser
     {
-        public string Username { get; set; } = null!;
-        public DateOnly DateCreated { get; set; }
-        public DateTime LastLogin { get; set; }
+        public DateTime DateCreated { get; set; } = DateTime.Now;
+        public DateTime? LastLogin { get; set; }
         public bool IsActive { get; set; } = true;
     }
 }

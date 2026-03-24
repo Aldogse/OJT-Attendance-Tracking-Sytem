@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Attendace_Tracking_Sytem.Models;
+using Attendace_Tracking_Sytem.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Attendace_Tracking_Sytem.Controllers

@@ -1,4 +1,4 @@
-namespace Attendace_Tracking_Sytem.Models
+namespace Attendace_Tracking_Sytem.ViewModels
 {
     public class ErrorViewModel
     {

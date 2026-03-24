@@ -2,6 +2,7 @@ using Attendace_Tracking_Sytem.Database;
 using Attendace_Tracking_Sytem.Interface;
 using Attendace_Tracking_Sytem.Models.StudentProfiles;
 using Attendace_Tracking_Sytem.Repository;
+using Attendace_Tracking_Sytem.Seeders;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,21 +14,30 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
-builder.Services.AddIdentity<StudentLogInCredentials, IdentityRole>()
+
+
+builder.Services.AddIdentity<StudentLogInCredentials,IdentityRole>()
     .AddEntityFrameworkStores<DatabaseContext>()
-    .AddDefaultTokenProviders();
-    
+    .AddDefaultTokenProviders();    
     
 builder.Services.AddScoped<IRegistrationRepository,RegistrationRepository>();
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    var roles = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    await RoleSeeder.SeedRoleAsync(roles);
 }
+
+
+    // Configure the HTTP request pipeline.
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Home/Error");
+        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        app.UseHsts();
+    }
 
 app.UseHttpsRedirection();
 app.UseRouting();

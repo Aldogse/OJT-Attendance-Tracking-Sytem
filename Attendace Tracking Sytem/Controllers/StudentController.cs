@@ -24,11 +24,9 @@ namespace Attendace_Tracking_Sytem.Controllers
             return View();
         }
 
-        public IActionResult StudentProfileForm(string UserId)
+        public IActionResult StudentProfileForm()
         {
-            var student = new StudentProfile();
-            student.UserId = UserId;
-            return View(student);
+            return View();
         }
 
         [HttpPost]
