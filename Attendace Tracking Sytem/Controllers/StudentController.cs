@@ -1,8 +1,10 @@
-﻿using Attendace_Tracking_Sytem.Database;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
+using Attendace_Tracking_Sytem.Database;
 using Attendace_Tracking_Sytem.Interface;
 using Attendace_Tracking_Sytem.Models;
 using Attendace_Tracking_Sytem.Models.StudentProfiles;
-using Attendace_Tracking_Sytem.ViewModels;
+using Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,11 +14,18 @@ namespace Attendace_Tracking_Sytem.Controllers
     {
         private readonly IRegistrationRepository _registrationRepository;
         private readonly DatabaseContext _databaseContext;
+        private readonly ILogger<StudentController> _logger;
+        private readonly IStudentRepository _studentRepository;
 
-        public StudentController(IRegistrationRepository registrationRepository,DatabaseContext databaseContext)
+        public StudentController(IRegistrationRepository registrationRepository
+            ,DatabaseContext databaseContext
+            ,ILogger<StudentController>logger,
+            IStudentRepository studentRepository)
         {
             _registrationRepository = registrationRepository;
             _databaseContext = databaseContext;
+            _logger = logger;
+            _studentRepository = studentRepository;
         }
 
         public IActionResult SuccessRegistrationPage()
@@ -24,9 +33,12 @@ namespace Attendace_Tracking_Sytem.Controllers
             return View();
         }
 
-        public IActionResult StudentProfileForm()
+        [HttpGet]
+        public IActionResult StudentProfileForm(string UserId)
         {
-            return View();
+            var studentProfile = new StudentProfile();
+            studentProfile.UserId = UserId;
+            return View(studentProfile);
         }
 
         [HttpPost]
@@ -105,6 +117,110 @@ namespace Attendace_Tracking_Sytem.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500,ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> HrPendingStudentDetails(int Id)
+        {
+            try
+            {
+                var student = await _studentRepository.PendingStudentWorkProfile(Id);
+
+                var studentVM = new StudentPendingWorkProfileVM()
+                {
+                    Department = student.Department,
+                    EndDate = student.EndDate,
+                    FullName = $"{student.StudentProfile.FirstName} {student.StudentProfile.MiddleName} {student.StudentProfile.LastName}",
+                    HoursRendered = student.HoursRendered,
+                    RequiredHours = student.RequiredHours,
+                    ShiftEnd = student.ShiftEnd,
+                    ShiftStart = student.ShiftStart,
+                    StartDate = student.StartDate,
+                    Status = student.Status,
+                    Id = Id
+                };
+
+                return View(studentVM);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(message:$"Error: {ex.Message}");
+                return RedirectToAction("Error","Home");
+            }
+        }
+
+        //TIME IN AND TIME OUT LOGIC
+        [HttpPost]
+        public async Task<IActionResult> TimeIn()
+        {
+            try
+            {
+                var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                //GET USER ID THAT MATCHES THE CURRENT STUDENT    
+                var student = await _databaseContext.StudentsProfile.AsNoTracking().Where(i => i.UserId == user)
+                    .FirstOrDefaultAsync();
+
+                //GET STUDENT PROFILE ID 
+                var profile = await _databaseContext.StudentsWorkProfile.AsNoTracking().Where(i => i.StudentProfileId == student.ProfileId)
+                    .FirstOrDefaultAsync();
+
+                await _studentRepository.ClockIn(profile.Id);
+                return RedirectToAction("StudentDashboard","Student");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(message:$"Error: {ex.Message}");
+                return RedirectToAction("Error","Home");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> TimeOut()
+        {
+            try
+            {
+                var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                var student = await _databaseContext.StudentsProfile.AsNoTracking().Where(i => i.UserId == user)
+                    .FirstOrDefaultAsync();
+
+                var profile = await _databaseContext.StudentsWorkProfile.AsNoTracking()
+                    .Where(i => i.StudentProfileId == student.ProfileId)
+                    .FirstOrDefaultAsync();
+
+                await _studentRepository.ClockOut(profile.Id);        
+
+                await _databaseContext.SaveChangesAsync();
+                return RedirectToAction("StudentDashboard","Student");              
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(message:$"Error: {ex.Message}");
+                return RedirectToAction("Error","Home");
+            }
+        }
+
+        //STUDENT DASHBOARD
+        public async Task<IActionResult> StudentDashboard()
+        {
+            try
+            {
+                var UserData = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if(UserData == null)
+                {
+                    return RedirectToAction("Account", "LoginPage");
+                }
+
+                var Student = await _studentRepository.GetStudentDashboardData(UserData);
+                return View(Student);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(message:$"Error: {ex.Message}");
+                return RedirectToAction("Error","Home");
             }
         }
     }

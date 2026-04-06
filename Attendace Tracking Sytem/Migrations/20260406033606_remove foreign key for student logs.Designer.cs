@@ -4,6 +4,7 @@ using Attendace_Tracking_Sytem.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Attendace_Tracking_Sytem.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260406033606_remove foreign key for student logs")]
+    partial class removeforeignkeyforstudentlogs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,13 +154,13 @@ namespace Attendace_Tracking_Sytem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LogId"));
 
+                    b.Property<int?>("Id")
+                        .HasColumnType("int");
+
                     b.Property<DateOnly>("LogDate")
                         .HasColumnType("date");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("StudentWorkProfileId")
+                    b.Property<int>("StudentWorkProfileId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("TimeIn")
@@ -424,7 +427,9 @@ namespace Attendace_Tracking_Sytem.Migrations
                 {
                     b.HasOne("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentWorkProfile", "StudentWorkProfile")
                         .WithMany()
-                        .HasForeignKey("StudentWorkProfileId");
+                        .HasForeignKey("StudentWorkProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("StudentWorkProfile");
                 });

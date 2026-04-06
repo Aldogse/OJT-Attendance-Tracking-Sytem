@@ -1,6 +1,6 @@
 using Attendace_Tracking_Sytem.Database;
 using Attendace_Tracking_Sytem.Interface;
-using Attendace_Tracking_Sytem.Models.StudentProfiles;
+using Attendace_Tracking_Sytem.Models.Account;
 using Attendace_Tracking_Sytem.Repository;
 using Attendace_Tracking_Sytem.Seeders;
 using Microsoft.AspNetCore.Identity;
@@ -16,11 +16,13 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 });
 
 
-builder.Services.AddIdentity<StudentLogInCredentials,IdentityRole>()
+builder.Services.AddIdentity<LogInCredentials,IdentityRole>()
     .AddEntityFrameworkStores<DatabaseContext>()
     .AddDefaultTokenProviders();    
     
 builder.Services.AddScoped<IRegistrationRepository,RegistrationRepository>();
+builder.Services.AddScoped<IHrRepository, HrRepository>();
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

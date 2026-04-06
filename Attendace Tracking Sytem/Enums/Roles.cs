@@ -4,6 +4,7 @@
     {
         Student,
         Admin,
-        Supervisor
+        Supervisor,
+        HR
     }
 }

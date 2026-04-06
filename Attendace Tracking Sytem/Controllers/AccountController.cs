@@ -1,18 +1,22 @@
-﻿using Attendace_Tracking_Sytem.Models.StudentProfiles;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Attendace_Tracking_Sytem.ViewModels;
+using Attendace_Tracking_Sytem.Models.Account;
+using Attendace_Tracking_Sytem.Enums;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Attendace_Tracking_Sytem.ViewModels.Account_Pages_VM;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace Attendace_Tracking_Sytem.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<LogInCredentials> _userManager;
+        private readonly SignInManager<LogInCredentials> _signInManager;
         private readonly ILogger<AccountController> _logger;
 
-        public AccountController(UserManager<IdentityUser>userManager,
-            SignInManager<IdentityUser>signInManager,
+        public AccountController(UserManager<LogInCredentials> userManager,
+            SignInManager<LogInCredentials> signInManager,
             ILogger<AccountController>logger)
         {
             _userManager = userManager;
@@ -20,13 +24,14 @@ namespace Attendace_Tracking_Sytem.Controllers
             _logger = logger;
         }
 
-        public IActionResult StudentRegistration()
+        [HttpGet]
+        public IActionResult StudentRegistrationForm()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> StudentRegistration(AccountRegistrationVM accountRegistrationVM)
+        public async Task<IActionResult> StudentRegistrationForm(AccountRegistrationVM accountRegistrationVM)
         {
             try
             {
@@ -36,7 +41,7 @@ namespace Attendace_Tracking_Sytem.Controllers
                     return View(accountRegistrationVM);
                 }
 
-                var newUser = new IdentityUser()
+                var newUser = new LogInCredentials()
                 {
                     Email = accountRegistrationVM.Email,
                     UserName = accountRegistrationVM.Email
@@ -47,7 +52,7 @@ namespace Attendace_Tracking_Sytem.Controllers
                 if (newUserCredentials.Succeeded)
                 {
                     var role = await _userManager.AddToRoleAsync(newUser,Enums.Roles.Student.ToString());
-                    return RedirectToAction("StudentProfile",new { UserId = newUser.Id});
+                    return RedirectToAction("StudentProfileForm","Student",new { UserId = newUser.Id});
                 }
 
                 foreach (var error in newUserCredentials.Errors)
@@ -63,5 +68,120 @@ namespace Attendace_Tracking_Sytem.Controllers
                 return RedirectToAction("SystemError");
             }
         }
+
+        //HR REGISTRATION PROCESS
+        [HttpGet]
+        public IActionResult HrRegistrationForm()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> HrRegistrationForm(AccountRegistrationVM accountRegistrationVM)
+        {
+            try
+            {
+                if(!ModelState.IsValid)
+                {
+                    ModelState.AddModelError("","Invalid Input!");
+                    return View(accountRegistrationVM);
+                }
+
+                var newUser = new LogInCredentials()
+                {
+                    UserName = accountRegistrationVM?.Email,
+                    Email = accountRegistrationVM?.Email,
+                };
+
+                var newUserCredentials = await _userManager.CreateAsync(newUser,accountRegistrationVM.Password);
+
+                if (newUserCredentials.Succeeded)
+                {
+                    var role = await _userManager.AddToRoleAsync(newUser,Roles.HR.ToString());
+                    return RedirectToAction("HrProfileForm","Hr",new {UserId = newUser.Id});
+                }
+
+                foreach (var err in newUserCredentials.Errors)
+                {
+                    ModelState.AddModelError("", err.Description);
+                }
+
+                return View(accountRegistrationVM);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(message:$"Error: {ex.Message}");
+                return RedirectToAction("InvalidOperation","Home");
+            }
+        }
+
+        [HttpGet]
+        public IActionResult LoginPage()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> LoginPage(LoginVM loginCredentials)
+        {
+            try
+            {
+                if(!ModelState.IsValid)
+                {
+                    ModelState.AddModelError("","Invalid Input!");
+                    return View(loginCredentials);
+                }
+
+                var user = await _userManager.FindByEmailAsync(loginCredentials.EmailAddress);
+                
+                if(user == null)
+                {
+                    ModelState.AddModelError("","Profile not found!");
+                    return View(loginCredentials);
+                }
+
+                var result = await _signInManager.PasswordSignInAsync(user.Email!, loginCredentials.Password,false,false);
+
+                if (result.Succeeded)
+                {
+                    if (await _userManager.IsInRoleAsync(user, "Student"))
+                    {
+                        return RedirectToAction("StudentDashboard", "Student",new {UserId = user.Id});
+                    }
+                    else if (await _userManager.IsInRoleAsync(user, "HR"))
+                    {
+                        return RedirectToAction("HrDashboard", "Hr",new {UserId = user.Id});
+                    }
+                    else if (await _userManager.IsInRoleAsync(user, "Supervisor"))
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+
+                ModelState.AddModelError("","Invalid Email or Password");
+                return View(loginCredentials);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(message:$"Error: {ex.Message}");
+                return RedirectToAction();
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> LogOut()
+        {
+            try
+            {
+               await _signInManager.SignOutAsync();
+               return RedirectToAction("LogOut", "Account");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(message:$"Error: {ex.Message}");
+                return RedirectToAction("Error","Home");
+            }
+        }
     }
 }
+

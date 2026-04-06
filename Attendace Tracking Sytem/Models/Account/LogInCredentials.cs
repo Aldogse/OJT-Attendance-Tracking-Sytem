@@ -2,9 +2,9 @@
 using System.Reflection.Metadata.Ecma335;
 using Microsoft.AspNetCore.Identity;
 
-namespace Attendace_Tracking_Sytem.Models.StudentProfiles
+namespace Attendace_Tracking_Sytem.Models.Account
 {
-    public class StudentLogInCredentials: IdentityUser
+    public class LogInCredentials: IdentityUser
     {
         public DateTime DateCreated { get; set; } = DateTime.Now;
         public DateTime? LastLogin { get; set; }

@@ -25,7 +25,10 @@
             
             <div class="card-body">
                 <div asp-validation-summary="All" class="text-danger"></div>
-                <form method="post" asp-action="StudentProfileForm">                   
+                <form method="post" asp-action="StudentProfileForm">
+
+                    <input  type= "hidden" asp-for="UserId" /> 
+
                     <!-- Student ID -->
                     <div class="mb-3">
                         <label asp-for="StudentId">Student ID</label>

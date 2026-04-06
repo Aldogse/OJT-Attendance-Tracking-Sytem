@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using Attendace_Tracking_Sytem.Models.Account;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.Primitives;
@@ -39,14 +40,16 @@ namespace Attendace_Tracking_Sytem.Models.StudentProfiles
         public string Email { get; set; } = null!;
 
         [Required]
+        [StringLength(11)]
         public string PhoneNumber { get; set; } = null!;
 
         //CREDENTIALS ID
         [ForeignKey("User")]
+        
         public string UserId { get; set; } = null!;
 
         [JsonIgnore]
         [ValidateNever]
-        public StudentLogInCredentials User { get; set; }
+        public LogInCredentials User { get; set; }
     }
 }

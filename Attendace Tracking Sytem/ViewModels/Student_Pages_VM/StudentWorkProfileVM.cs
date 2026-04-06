@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Attendace_Tracking_Sytem.Enums;
 
-namespace Attendace_Tracking_Sytem.ViewModels
+namespace Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM
 {
     public class StudentWorkProfileVM
     {
