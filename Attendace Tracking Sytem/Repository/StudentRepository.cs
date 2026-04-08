@@ -41,7 +41,8 @@ namespace Attendace_Tracking_Sytem.Repository
                 {
                     StudentWorkProfileId = StudentWorkProfileId,
                     LogDate = DateOnly.FromDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day)),
-                    TimeIn = DateTime.Now
+                    TimeIn = DateTime.Now,
+                    TimeOut = null
                 };
 
                 await _databaseContext.StudentLogs.AddAsync(logs);
@@ -63,10 +64,9 @@ namespace Attendace_Tracking_Sytem.Repository
             studentData.TimeOut = DateTime.Now;
             studentData.Status = Enums.AttendanceStatus.Complete;
 
-            studentData.TotalHours = Math.Round
-            (
-             (decimal)(studentData.TimeOut - studentData.TimeIn).TotalHours,2   
-            );
+            TimeSpan totalHours = studentData.TimeOut.Value - studentData.TimeIn;
+            studentData.TotalHours = Math.Round((decimal)totalHours.TotalHours,2);
+
             return studentData;
         }
 

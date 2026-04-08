@@ -20,7 +20,7 @@ namespace Attendace_Tracking_Sytem.Models.StudentProfiles
 
         public DateTime TimeIn { get; set; }
 
-        public DateTime TimeOut { get; set; }
+        public DateTime? TimeOut { get; set; } = null;
 
         public decimal? TotalHours { get; set; }
         public AttendanceStatus Status { get; set; } = AttendanceStatus.Incomplete;
