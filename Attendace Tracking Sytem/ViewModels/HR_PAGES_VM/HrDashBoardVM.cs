@@ -1,4 +1,5 @@
-﻿using Attendace_Tracking_Sytem.Models.StudentProfiles;
+﻿using Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS;
+using Attendace_Tracking_Sytem.Models.StudentProfiles;
 
 namespace Attendace_Tracking_Sytem.ViewModels.HR_DASHBOARD_VM
 {
@@ -6,8 +7,9 @@ namespace Attendace_Tracking_Sytem.ViewModels.HR_DASHBOARD_VM
     {
         public string FullName { get; set; }
         public int NumberOfActiveStudents { get; set; }
-        public List<StudentWorkProfile> PendingStudents { get; set; }
+        public List<StudentProfile>? PendingStudents { get; set; }
         public int FinishingStudents { get; set; }
+        public List<MissedTimeouts>? MissedTimeouts { get; set; }
 
     }
 }

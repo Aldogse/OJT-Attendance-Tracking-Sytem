@@ -5,9 +5,10 @@ namespace Attendace_Tracking_Sytem.Interface
 {
     public interface IStudentRepository
     {
-        Task<StudentWorkProfile> PendingStudentWorkProfile(int Id);
+        Task<StudentProfile> PendingStudentWorkProfile(int Id);
         Task<StudentLogs> ClockIn(int? Id);
         Task<StudentLogs> ClockOut(int? Id);
         Task<StudentDashboardVM> GetStudentDashboardData(string UserId);
+        Task<List<StudentLogs>> MissedTimeOuts(DateOnly date);
     }
 }

@@ -8,8 +8,7 @@ namespace Attendace_Tracking_Sytem.Interface
 {
     public interface IRegistrationRepository
     {
-        Task<StudentProfile> StudentProfileSetUp(StudentProfile studentProfile);
-        Task<StudentWorkProfile> StudentWorkProfileSetUp(StudentWorkProfileVM studentWorkProfileVM);
+        Task<StudentProfile> StudentProfileSetUp(StudentProfileVM studentProfile);
         Task<HRProfile>HrProfileSetUp(HrProfileVM HrProfile);
     }
 }

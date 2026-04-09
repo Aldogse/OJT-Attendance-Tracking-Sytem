@@ -3,6 +3,7 @@ using Attendace_Tracking_Sytem.Interface;
 using Attendace_Tracking_Sytem.Models.Account;
 using Attendace_Tracking_Sytem.Repository;
 using Attendace_Tracking_Sytem.Seeders;
+using Attendace_Tracking_Sytem.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,7 +24,13 @@ builder.Services.AddIdentity<LogInCredentials,IdentityRole>()
 builder.Services.AddScoped<IRegistrationRepository,RegistrationRepository>();
 builder.Services.AddScoped<IHrRepository, HrRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+
+//BACKGROUND SERVICES
+//builder.Services.AddHostedService<LogCheckBackgroundService>();
+
 var app = builder.Build();
+
+
 
 using (var scope = app.Services.CreateScope())
 {

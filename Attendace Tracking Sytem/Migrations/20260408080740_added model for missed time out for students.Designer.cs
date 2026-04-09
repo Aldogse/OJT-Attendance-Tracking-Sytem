@@ -4,6 +4,7 @@ using Attendace_Tracking_Sytem.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Attendace_Tracking_Sytem.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260408080740_added model for missed time out for students")]
+    partial class addedmodelformissedtimeoutforstudents
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,7 +163,7 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.Property<bool>("Missed")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("ProfileId")
+                    b.Property<int?>("StudentWorkProfileId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -179,10 +182,10 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.Property<DateOnly>("LogDate")
                         .HasColumnType("date");
 
-                    b.Property<int?>("ProfileId")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("StudentWorkProfileId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("TimeIn")
@@ -196,7 +199,7 @@ namespace Attendace_Tracking_Sytem.Migrations
 
                     b.HasKey("LogId");
 
-                    b.HasIndex("ProfileId");
+                    b.HasIndex("StudentWorkProfileId");
 
                     b.ToTable("StudentLogs");
                 });
@@ -212,25 +215,14 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.Property<int>("Age")
                         .HasColumnType("int");
 
-                    b.Property<string>("Department")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal?>("HoursRendered")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -247,25 +239,10 @@ namespace Attendace_Tracking_Sytem.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
-                    b.Property<decimal>("RequiredHours")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("School")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<TimeOnly>("ShiftEnd")
-                        .HasColumnType("time");
-
-                    b.Property<TimeOnly>("ShiftStart")
-                        .HasColumnType("time");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
 
                     b.Property<string>("StudentId")
                         .IsRequired()
@@ -281,6 +258,50 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("StudentsProfile");
+                });
+
+            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentWorkProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Department")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<decimal?>("HoursRendered")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("RequiredHours")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<TimeOnly>("ShiftEnd")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly>("ShiftStart")
+                        .HasColumnType("time");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("StudentProfileId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentProfileId");
+
+                    b.ToTable("StudentsWorkProfile");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -429,12 +450,11 @@ namespace Attendace_Tracking_Sytem.Migrations
 
             modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentLogs", b =>
                 {
-                    b.HasOne("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentProfile", "StudentProfile")
+                    b.HasOne("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentWorkProfile", "StudentWorkProfile")
                         .WithMany()
-                        .HasForeignKey("ProfileId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("StudentWorkProfileId");
 
-                    b.Navigation("StudentProfile");
+                    b.Navigation("StudentWorkProfile");
                 });
 
             modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentProfile", b =>
@@ -446,6 +466,15 @@ namespace Attendace_Tracking_Sytem.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentWorkProfile", b =>
+                {
+                    b.HasOne("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentProfile", "StudentProfile")
+                        .WithMany()
+                        .HasForeignKey("StudentProfileId");
+
+                    b.Navigation("StudentProfile");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

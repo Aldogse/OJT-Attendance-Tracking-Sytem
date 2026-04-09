@@ -17,14 +17,14 @@ namespace Attendace_Tracking_Sytem.Repository
 
         public async Task ApproveStudentWorkProfile(int Id)
         {
-            var student = new StudentWorkProfile { Id = Id };
+            var student = new StudentProfile { ProfileId = Id };
 
 
-            _databaseContext.StudentsWorkProfile.Attach(student);
+            _databaseContext.StudentsProfile.Attach(student);
 
             student.Status = Enums.Status.Active;
 
-            _databaseContext.StudentsWorkProfile.Entry(student)
+            _databaseContext.StudentsProfile.Entry(student)
                 .Property(i => i.Status).IsModified = true;
 
             await _databaseContext.SaveChangesAsync();
@@ -40,20 +40,23 @@ namespace Attendace_Tracking_Sytem.Repository
             DateTime date = DateTime.Now;
             var UserData = await _databaseContext.HRProfile.Where(i => i.UserId == UserId).FirstOrDefaultAsync();
 
-            var pendingStatus = await _databaseContext.StudentsWorkProfile.Include(i => i.StudentProfile).Where(i => i.Status == Enums.Status.Pending)
+            var pendingStatus = await _databaseContext.StudentsProfile.Where(i => i.Status == Enums.Status.Pending)
                 .ToListAsync();
 
-            var numberOfActiveStudents = await _databaseContext.StudentsWorkProfile.Where(i => i.Status == Enums.Status.Active)
+            var numberOfActiveStudents = await _databaseContext.StudentsProfile.Where(i => i.Status == Enums.Status.Active)
                 .CountAsync();
 
-            var NumOfFinishingStudents = await _databaseContext.StudentsWorkProfile.Where(i => i.EndDate.Month == date.Month).CountAsync();
+            var NumOfFinishingStudents = await _databaseContext.StudentsProfile.Where(i => i.EndDate.Month == date.Month).CountAsync();
+            
+            var MissedLogs = await _databaseContext.MissedTimeouts.ToListAsync();
 
             return new HrDashBoardVM
             {
                 NumberOfActiveStudents = numberOfActiveStudents,
                 FinishingStudents = NumOfFinishingStudents,
                 PendingStudents = pendingStatus,
-                FullName = $"{UserData.FirstName} {UserData.MiddleName} {UserData.LastName}"
+                FullName = $"{UserData.FirstName} {UserData.MiddleName} {UserData.LastName}",
+                MissedTimeouts = MissedLogs
             };
         }
     }

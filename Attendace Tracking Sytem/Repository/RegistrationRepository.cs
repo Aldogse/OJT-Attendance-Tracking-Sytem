@@ -38,18 +38,17 @@ namespace Attendace_Tracking_Sytem.Repository
         }
 
         //STUDENTS QUERIES
-        public async Task<StudentProfile> StudentProfileSetUp(StudentProfile studentProfile)
+        public async Task<StudentProfile> StudentProfileSetUp(StudentProfileVM studentProfile)
         {
             var StudentOjtProfile = new StudentProfile()
             {
                 StudentId = studentProfile.StudentId,
                 Age = studentProfile.Age,
                 Email = studentProfile.Email,
-                FirstName = studentProfile.FirstName,
+                FirstName = studentProfile.Firstname,
                 LastName = studentProfile.LastName,
                 MiddleName = studentProfile.MiddleName,
                 PhoneNumber = studentProfile.PhoneNumber,
-                ProfileId = studentProfile.ProfileId,
                 School = studentProfile.School,
                 UserId = studentProfile.UserId,
             };
@@ -57,21 +56,6 @@ namespace Attendace_Tracking_Sytem.Repository
             await _databaseContext.StudentsProfile.AddAsync(StudentOjtProfile);
             await _databaseContext.SaveChangesAsync();
             return StudentOjtProfile;
-        }
-
-        public async Task<StudentWorkProfile> StudentWorkProfileSetUp(StudentWorkProfileVM studentWorkProfileVM)
-        {
-            var StudentOjtWorkProfile = new StudentWorkProfile()
-            {
-                StudentProfileId = studentWorkProfileVM.StudentProfileId,
-                Department = studentWorkProfileVM.Department,
-                StartDate = studentWorkProfileVM.StartDate,
-                EndDate = studentWorkProfileVM.EndDate,           
-            };
-
-            await _databaseContext.StudentsWorkProfile.AddAsync(StudentOjtWorkProfile);
-            await _databaseContext.SaveChangesAsync();
-            return StudentOjtWorkProfile;
         }
 
 

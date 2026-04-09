@@ -52,7 +52,7 @@ namespace Attendace_Tracking_Sytem.Controllers
                 if (newUserCredentials.Succeeded)
                 {
                     var role = await _userManager.AddToRoleAsync(newUser,Enums.Roles.Student.ToString());
-                    return RedirectToAction("StudentProfileForm","Student",new { UserId = newUser.Id});
+                    return RedirectToAction("StudentProfileForm", "Student",new { UserId = newUser.Id});
                 }
 
                 foreach (var error in newUserCredentials.Errors)

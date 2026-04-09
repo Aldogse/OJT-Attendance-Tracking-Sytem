@@ -13,7 +13,7 @@ namespace Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM
 
         [Required]
         public DateOnly StartDate { get; set; }
-
+            
         [Required]
         public DateOnly EndDate { get; set; }
 

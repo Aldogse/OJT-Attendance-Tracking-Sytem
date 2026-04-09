@@ -10,10 +10,10 @@ namespace Attendace_Tracking_Sytem.Models.StudentProfiles
         [Key]
         public int LogId { get; set; }
 
-        public int? StudentWorkProfileId { get; set; }
+        public int? ProfileId { get; set; }
 
         [ValidateNever]
-        public StudentWorkProfile StudentWorkProfile { get; set; }
+        public StudentProfile StudentProfile { get; set; }
 
         [Required]
         public DateOnly LogDate { get; set; }

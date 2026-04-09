@@ -36,13 +36,13 @@ namespace Attendace_Tracking_Sytem.Controllers
         [HttpGet]
         public IActionResult StudentProfileForm(string UserId)
         {
-            var studentProfile = new StudentProfile();
+            var studentProfile = new StudentProfileVM();
             studentProfile.UserId = UserId;
             return View(studentProfile);
         }
 
         [HttpPost]
-        public async Task<IActionResult> StudentProfileForm(StudentProfile StudentProfile)
+        public async Task<IActionResult> StudentProfileForm(StudentProfileVM StudentProfile)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace Attendace_Tracking_Sytem.Controllers
                     return View(StudentProfile);
                 }
                 var newStudent = await _registrationRepository.StudentProfileSetUp(StudentProfile);
-                return RedirectToAction("StudentWorkProfileForm",new { StudentProfileId = newStudent.ProfileId});              
+                return RedirectToAction("Success");            
             }
             catch (Exception ex)
             {
@@ -76,69 +76,26 @@ namespace Attendace_Tracking_Sytem.Controllers
             }
         }
 
-        public IActionResult StudentWorkProfileForm(int StudentProfileId)
-        {
-            StudentWorkProfileVM student = new StudentWorkProfileVM();
-            student.StudentProfileId = StudentProfileId;
-            return View(student);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> StudentWorkProfileForm(StudentWorkProfileVM studentWorkProfileVM)
-        {
-            try
-            {
-                DateOnly currDate = DateOnly.FromDateTime(new DateTime(DateTime.Now.Year,DateTime.Now.Month,DateTime.Now.Day));
-                if (!ModelState.IsValid)
-                {
-                    ModelState.AddModelError("","Invalid Submission Try again!");
-                    return View(studentWorkProfileVM);
-                }
-
-                if(studentWorkProfileVM.StartDate == studentWorkProfileVM.EndDate)
-                {
-                    ModelState.AddModelError("","Start date and End date cannot be the same.");
-                    return View(studentWorkProfileVM);
-                }
-                else if (studentWorkProfileVM.EndDate < studentWorkProfileVM.StartDate)                  
-                {
-                    ModelState.AddModelError("","End Date cannot be greater than Start Date!");
-                    return View(studentWorkProfileVM);
-                }
-                else if (studentWorkProfileVM.StartDate < currDate || studentWorkProfileVM.EndDate < currDate)
-                {
-                    ModelState.AddModelError("","Dates cannot be in the past!");
-                    return View(studentWorkProfileVM);
-                }
-
-                var newStudentWorkProfile = await _registrationRepository.StudentWorkProfileSetUp(studentWorkProfileVM);               
-                return RedirectToAction("ProfileSuccess");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500,ex.Message);
-            }
-        }
 
         [HttpGet]
-        public async Task<IActionResult> HrPendingStudentDetails(int Id)
+        public async Task<IActionResult> HrPendingStudentDetails(int ProfileId)
         {
             try
             {
-                var student = await _studentRepository.PendingStudentWorkProfile(Id);
+                var student = await _studentRepository.PendingStudentWorkProfile(ProfileId);
 
                 var studentVM = new StudentPendingWorkProfileVM()
                 {
                     Department = student.Department,
                     EndDate = student.EndDate,
-                    FullName = $"{student.StudentProfile.FirstName} {student.StudentProfile.MiddleName} {student.StudentProfile.LastName}",
+                    FullName = $"{student.FirstName} {student.MiddleName} {student.LastName}",
                     HoursRendered = student.HoursRendered,
                     RequiredHours = student.RequiredHours,
                     ShiftEnd = student.ShiftEnd,
                     ShiftStart = student.ShiftStart,
                     StartDate = student.StartDate,
                     Status = student.Status,
-                    Id = Id
+                    Id = ProfileId
                 };
 
                 return View(studentVM);
@@ -162,17 +119,18 @@ namespace Attendace_Tracking_Sytem.Controllers
                 var student = await _databaseContext.StudentsProfile.AsNoTracking().Where(i => i.UserId == user)
                     .FirstOrDefaultAsync();
 
-                //GET STUDENT PROFILE ID 
-                var profile = await _databaseContext.StudentsWorkProfile.AsNoTracking().Where(i => i.StudentProfileId == student.ProfileId)
-                    .FirstOrDefaultAsync();
+                if(student == null)
+                {
+                    return RedirectToAction("Error","Home");
+                }
 
-                await _studentRepository.ClockIn(profile.Id);
-                return RedirectToAction("StudentDashboard","Student");
+                await _studentRepository.ClockIn(student.ProfileId);
+                return RedirectToAction("StudentDashboard", "Student");
             }
             catch (Exception ex)
             {
-                _logger.LogError(message:$"Error: {ex.Message}");
-                return RedirectToAction("Error","Home");
+                _logger.LogError(message: $"Error: {ex.Message}");
+                return RedirectToAction("Error", "Home");
             }
         }
 
@@ -186,19 +144,16 @@ namespace Attendace_Tracking_Sytem.Controllers
                 var student = await _databaseContext.StudentsProfile.AsNoTracking().Where(i => i.UserId == user)
                     .FirstOrDefaultAsync();
 
-                var profile = await _databaseContext.StudentsWorkProfile.AsNoTracking()
-                    .Where(i => i.StudentProfileId == student.ProfileId)
-                    .FirstOrDefaultAsync();
 
-                await _studentRepository.ClockOut(profile.Id);        
+                await _studentRepository.ClockOut(student.ProfileId);
 
                 await _databaseContext.SaveChangesAsync();
-                return RedirectToAction("StudentDashboard","Student");              
+                return RedirectToAction("StudentDashboard", "Student");
             }
             catch (Exception ex)
             {
-                _logger.LogError(message:$"Error: {ex.Message}");
-                return RedirectToAction("Error","Home");
+                _logger.LogError(message: $"Error: {ex.Message}");
+                return RedirectToAction("Error", "Home");
             }
         }
 

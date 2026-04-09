@@ -1,4 +1,4 @@
-﻿@model Attendace_Tracking_Sytem.Models.StudentProfiles.StudentProfile
+﻿@model Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM.StudentProfileVM
 
 <!DOCTYPE html>
 
@@ -43,12 +43,33 @@
                         <span asp-validation-for="School" class="text-danger"></span>
                     </div>
 
+                    <!-- Work Details -->
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Department" class="form-label">Department</label>
+                            <input type="text" asp-for="Department" class="form-control" maxlength="50" required>
+                            <span asp-validation-for="Department" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="StartDate" class="form-label">Start Date</label>
+                            <input type="date" asp-for="StartDate" class="form-control" required>
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="EndDate" class="form-label">End Date</label>
+                            <input type="date" asp-for="EndDate" class="form-control" required>
+                            <span asp-validation-for="EndDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
                     <!-- Name Row -->
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label class="form-label">First Name</label>
-                            <input type="text" asp-for="FirstName" class="form-control" required maxlength="50">
-                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                            <input type="text" asp-for="Firstname" class="form-control" required maxlength="50">
+                            <span asp-validation-for="Firstname" class="text-danger"></span>
                         </div>
 
                         <div class="col-md-4 mb-3">
