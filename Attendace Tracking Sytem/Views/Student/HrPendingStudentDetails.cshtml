@@ -80,12 +80,12 @@
         <div class="d-flex flex-wrap gap-2">
 
             <form asp-action="ApproveProfile" asp-controller="Hr" method="post">
-                <input type="hidden" name="Id" value="@Model.Id" />
+                <input type="hidden" name="Id" value="@Model.ProfileId" />
                 <button type="submit" class="btn btn-success px-4">Approve</button>
             </form>
 
             <form asp-action="DenyProfile" asp-controller="Hr" method="post">
-                <input type="hidden" name="Id" value="@Model.Id" />
+                <input type="hidden" name="Id" value="@Model.ProfileId" />
                 <button type="submit" class="btn btn-danger px-4">Deny</button>
             </form>
 

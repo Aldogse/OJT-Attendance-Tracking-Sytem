@@ -25,7 +25,7 @@ namespace Attendace_Tracking_Sytem.Services
                 try
                 {
                     using var scope = _serviceScope.CreateScope();
-                    var repository = scope.ServiceProvider.GetRequiredService<IStudentRepository>();
+                    var repository = scope.ServiceProvider.GetRequiredService<IHrRepository>();
                     var database = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
                     DateTime now = DateTime.Now;
                     DateTime nextDay = now.Date.AddDays(1);
@@ -42,13 +42,14 @@ namespace Attendace_Tracking_Sytem.Services
             }
         }
 
-        private async Task LogBackgroundService(IStudentRepository studentRepository,DatabaseContext database)
+        private async Task LogBackgroundService(IHrRepository hrRepository,DatabaseContext database)
         {
             try
             {
-                DateOnly date = DateOnly.FromDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).AddDays(-1));
+                //this should have .adddays + 1
+                DateOnly date = DateOnly.FromDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day));
 
-                var missedTimeOuts = await studentRepository.MissedTimeOuts(date);
+                var missedTimeOuts = await hrRepository.MissedTimeOuts(date);
 
                 if(missedTimeOuts == null || missedTimeOuts.Count == 0)
                 {

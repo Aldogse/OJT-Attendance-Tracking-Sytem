@@ -12,8 +12,7 @@
 </head>
 <body class="bg-light">
 
-    <div class="container py-4">
-
+    <div class="container py-4"  >   
         <!-- Header -->
         <div class="mb-4">
             <h2 class="fw-bold">HR Dashboard</h2>
@@ -63,7 +62,6 @@
                         <table class="table table-hover align-middle">
                             <thead class="table-light">
                                 <tr>
-                                    <th>#</th>
                                     <th>Student Name</th>
                                     <th>Company</th>
                                     <th>Position</th>
@@ -71,13 +69,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @{
-                                    int count = 1;
-                                }
                                 @foreach (var student in Model.PendingStudents)
                                 {
                                     <tr>
-                                        <td>@count</td>
                                         <td>@student.FirstName @student.LastName</td>
                                         <td>@student.School</td>
                                         <td>@student.Department</td>
@@ -85,13 +79,13 @@
                                             <span class="badge bg-warning text-dark">Pending</span>
                                         </td>
                                         <td>
-                                            <a asp-action="HrPendingStudentDetails" asp-controller="Student" asp-route-id="@student.ProfileId" class="btn btn-sm btn-primary">
+                                            <a asp-action="HrPendingStudentDetails" asp-controller="Student" asp-route-ProfileId="@student.ProfileId" class="btn btn-sm btn-primary">
                                                 View
                                             </a>
                                         </td>
-                                    </tr>
-                                    count++;
+                                    </tr>                                                  
                                 }
+                                
                             </tbody>
                         </table>
                     </div>
@@ -135,11 +129,11 @@
                                         </td>
                                         <td>
                                             <a asp-action="MissedLogDetails"
-                                               asp-controller="Student"
-                                               asp-route-id="@log.LogId"
+                                               asp-controller="Hr"
+                                               asp-route-ProfileId="@log.ProfileId"
                                                class="btn btn-sm btn-primary"
                                                title="View Details">
-                                                <i class="bi bi-arrow-right-circle-fill fs-5"></i>
+                                                <i class="bi bi-arrow-right-circle-fill fs-5"></i>  
                                             </a>
                                         </td>
                                     </tr>

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Attendace_Tracking_Sytem.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20260324122252_added new schema")]
-    partial class addednewschema
+    [Migration("20260411054522_initial migration for somee")]
+    partial class initialmigrationforsomee
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace Attendace_Tracking_Sytem.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentLogInCredentials", b =>
+            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.Account.LogInCredentials", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -99,7 +99,7 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentProfile", b =>
+            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.HR_Profiles.HRProfile", b =>
                 {
                     b.Property<int>("ProfileId")
                         .ValueGeneratedOnAdd()
@@ -107,10 +107,17 @@ namespace Attendace_Tracking_Sytem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProfileId"));
 
-                    b.Property<int>("Age")
-                        .HasColumnType("int");
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("ContactNumber")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
+
+                    b.Property<string>("EmployeeId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -125,18 +132,145 @@ namespace Attendace_Tracking_Sytem.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("MiddleName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ProfileId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("HRProfile");
+                });
+
+            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS.MissedTimeouts", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("LogDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("LogId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Missed")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ProfileId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProfileId");
+
+                    b.ToTable("MissedTimeouts");
+                });
+
+            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentLogs", b =>
+                {
+                    b.Property<int>("LogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LogId"));
+
+                    b.Property<DateOnly>("LogDate")
+                        .HasColumnType("date");
+
+                    b.Property<int?>("ProfileId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TimeIn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("TimeOut")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("TotalHours")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("LogId");
+
+                    b.HasIndex("ProfileId");
+
+                    b.ToTable("StudentLogs");
+                });
+
+            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentProfile", b =>
+                {
+                    b.Property<int>("ProfileId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProfileId"));
+
+                    b.Property<int>("Age")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Department")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal?>("HoursRendered")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("MiddleName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
+
+                    b.Property<decimal>("RequiredHours")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("School")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<TimeOnly>("ShiftEnd")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly>("ShiftStart")
+                        .HasColumnType("time");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<string>("StudentId")
                         .IsRequired()
@@ -152,50 +286,6 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("StudentsProfile");
-                });
-
-            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentWorkProfile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Department")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
-
-                    b.Property<decimal?>("HoursRendered")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("RequiredHours")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<TimeOnly>("ShiftEnd")
-                        .HasColumnType("time");
-
-                    b.Property<TimeOnly>("ShiftStart")
-                        .HasColumnType("time");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("StudentProfileId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudentProfileId");
-
-                    b.ToTable("StudentsWorkProfile");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -331,9 +421,9 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentProfile", b =>
+            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.HR_Profiles.HRProfile", b =>
                 {
-                    b.HasOne("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentLogInCredentials", "User")
+                    b.HasOne("Attendace_Tracking_Sytem.Models.Account.LogInCredentials", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -342,13 +432,34 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentWorkProfile", b =>
+            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS.MissedTimeouts", b =>
+                {
+                    b.HasOne("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentProfile", "Profile")
+                        .WithMany()
+                        .HasForeignKey("ProfileId");
+
+                    b.Navigation("Profile");
+                });
+
+            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentLogs", b =>
                 {
                     b.HasOne("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentProfile", "StudentProfile")
                         .WithMany()
-                        .HasForeignKey("StudentProfileId");
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("StudentProfile");
+                });
+
+            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentProfile", b =>
+                {
+                    b.HasOne("Attendace_Tracking_Sytem.Models.Account.LogInCredentials", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -362,7 +473,7 @@ namespace Attendace_Tracking_Sytem.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentLogInCredentials", null)
+                    b.HasOne("Attendace_Tracking_Sytem.Models.Account.LogInCredentials", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -371,7 +482,7 @@ namespace Attendace_Tracking_Sytem.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentLogInCredentials", null)
+                    b.HasOne("Attendace_Tracking_Sytem.Models.Account.LogInCredentials", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -386,7 +497,7 @@ namespace Attendace_Tracking_Sytem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentLogInCredentials", null)
+                    b.HasOne("Attendace_Tracking_Sytem.Models.Account.LogInCredentials", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -395,7 +506,7 @@ namespace Attendace_Tracking_Sytem.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentLogInCredentials", null)
+                    b.HasOne("Attendace_Tracking_Sytem.Models.Account.LogInCredentials", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

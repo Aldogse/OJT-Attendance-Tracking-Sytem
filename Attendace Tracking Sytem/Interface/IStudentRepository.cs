@@ -1,4 +1,5 @@
-﻿using Attendace_Tracking_Sytem.Models.StudentProfiles;
+﻿using Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS;
+using Attendace_Tracking_Sytem.Models.StudentProfiles;
 using Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM;
 
 namespace Attendace_Tracking_Sytem.Interface
@@ -9,6 +10,5 @@ namespace Attendace_Tracking_Sytem.Interface
         Task<StudentLogs> ClockIn(int? Id);
         Task<StudentLogs> ClockOut(int? Id);
         Task<StudentDashboardVM> GetStudentDashboardData(string UserId);
-        Task<List<StudentLogs>> MissedTimeOuts(DateOnly date);
     }
 }

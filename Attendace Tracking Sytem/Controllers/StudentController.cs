@@ -95,7 +95,7 @@ namespace Attendace_Tracking_Sytem.Controllers
                     ShiftStart = student.ShiftStart,
                     StartDate = student.StartDate,
                     Status = student.Status,
-                    Id = ProfileId
+                    ProfileId = ProfileId
                 };
 
                 return View(studentVM);
@@ -158,6 +158,7 @@ namespace Attendace_Tracking_Sytem.Controllers
         }
 
         //STUDENT DASHBOARD
+        [HttpGet]
         public async Task<IActionResult> StudentDashboard()
         {
             try

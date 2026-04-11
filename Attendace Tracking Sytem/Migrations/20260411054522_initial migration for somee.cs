@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Attendace_Tracking_Sytem.Migrations
 {
     /// <inheritdoc />
-    public partial class addedroleandidentity : Migration
+    public partial class initialmigrationforsomee : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,12 +30,12 @@ namespace Attendace_Tracking_Sytem.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    DateCreated = table.Column<DateOnly>(type: "date", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastLogin = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -159,6 +159,111 @@ namespace Attendace_Tracking_Sytem.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "HRProfile",
+                columns: table => new
+                {
+                    ProfileId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    MiddleName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    EmployeeId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ContactNumber = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_HRProfile", x => x.ProfileId);
+                    table.ForeignKey(
+                        name: "FK_HRProfile_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudentsProfile",
+                columns: table => new
+                {
+                    ProfileId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StudentId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    School = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    MiddleName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Age = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
+                    Department = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    StartDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    EndDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    HoursRendered = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    RequiredHours = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ShiftStart = table.Column<TimeOnly>(type: "time", nullable: false),
+                    ShiftEnd = table.Column<TimeOnly>(type: "time", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudentsProfile", x => x.ProfileId);
+                    table.ForeignKey(
+                        name: "FK_StudentsProfile_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MissedTimeouts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LogId = table.Column<int>(type: "int", nullable: false),
+                    ProfileId = table.Column<int>(type: "int", nullable: true),
+                    LogDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    Missed = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MissedTimeouts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MissedTimeouts_StudentsProfile_ProfileId",
+                        column: x => x.ProfileId,
+                        principalTable: "StudentsProfile",
+                        principalColumn: "ProfileId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudentLogs",
+                columns: table => new
+                {
+                    LogId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProfileId = table.Column<int>(type: "int", nullable: true),
+                    LogDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    TimeIn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TimeOut = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TotalHours = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudentLogs", x => x.LogId);
+                    table.ForeignKey(
+                        name: "FK_StudentLogs_StudentsProfile_ProfileId",
+                        column: x => x.ProfileId,
+                        principalTable: "StudentsProfile",
+                        principalColumn: "ProfileId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -197,6 +302,26 @@ namespace Attendace_Tracking_Sytem.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HRProfile_UserId",
+                table: "HRProfile",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MissedTimeouts_ProfileId",
+                table: "MissedTimeouts",
+                column: "ProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentLogs_ProfileId",
+                table: "StudentLogs",
+                column: "ProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentsProfile_UserId",
+                table: "StudentsProfile",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -218,7 +343,19 @@ namespace Attendace_Tracking_Sytem.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "HRProfile");
+
+            migrationBuilder.DropTable(
+                name: "MissedTimeouts");
+
+            migrationBuilder.DropTable(
+                name: "StudentLogs");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "StudentsProfile");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

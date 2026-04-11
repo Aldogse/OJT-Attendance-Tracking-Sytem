@@ -1,10 +1,13 @@
 ﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using AspNetCoreGeneratedDocument;
 using Attendace_Tracking_Sytem.Database;
 using Attendace_Tracking_Sytem.Interface;
 using Attendace_Tracking_Sytem.Models.Account;
 using Attendace_Tracking_Sytem.Models.HR_Profiles;
+using Attendace_Tracking_Sytem.Models.StudentProfiles;
 using Attendace_Tracking_Sytem.ViewModels.HR_PAGES_VM;
+using Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -99,6 +102,29 @@ namespace Attendace_Tracking_Sytem.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(message:$"Error: {ex.Message}");
+                return RedirectToAction("Error","Home");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MissedLogDetails(int ProfileId)
+        {
+            try
+            {
+                StudentMissedLogDetailsVM? studentData = await _databaseContext.MissedTimeouts.Where(i => i.ProfileId == ProfileId)
+                    .Select(i => new StudentMissedLogDetailsVM
+                    {
+                        Department = i.Profile.Department,
+                        Fullname = $"{i.Profile.FirstName} {i.Profile.MiddleName} {i.Profile.LastName}",
+                        Logdate = i.LogDate.ToShortDateString(),
+                        ProfileId = ProfileId
+                    }).FirstOrDefaultAsync();
+
+                return View(studentData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(message:$"Error:{ex.Message}");
                 return RedirectToAction("Error","Home");
             }
         }

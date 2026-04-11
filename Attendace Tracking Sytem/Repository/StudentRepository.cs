@@ -95,13 +95,5 @@ namespace Attendace_Tracking_Sytem.Repository
             return student;
 
         }
-
-        public async Task<List<StudentLogs>> MissedTimeOuts(DateOnly date)
-        {
-            List<StudentLogs> missedTimeout = await _databaseContext.StudentLogs.Where(i => i.LogDate == date && i.TimeOut == null)
-                .ToListAsync();
-
-            return missedTimeout;
-        }
     }
 }

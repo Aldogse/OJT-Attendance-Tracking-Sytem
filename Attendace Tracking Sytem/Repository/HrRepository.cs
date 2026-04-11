@@ -1,5 +1,6 @@
 ﻿using Attendace_Tracking_Sytem.Database;
 using Attendace_Tracking_Sytem.Interface;
+using Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS;
 using Attendace_Tracking_Sytem.Models.StudentProfiles;
 using Attendace_Tracking_Sytem.ViewModels.HR_DASHBOARD_VM;
 using Microsoft.EntityFrameworkCore;
@@ -58,6 +59,19 @@ namespace Attendace_Tracking_Sytem.Repository
                 FullName = $"{UserData.FirstName} {UserData.MiddleName} {UserData.LastName}",
                 MissedTimeouts = MissedLogs
             };
+        }
+
+        public async Task<List<StudentLogs>> MissedTimeOuts(DateOnly date)
+        {
+            List<StudentLogs> missedTimeout = await _databaseContext.StudentLogs.Where(i => i.LogDate == date && i.TimeOut == null)
+                .ToListAsync();
+
+            return missedTimeout;
+        }
+
+        public Task<MissedTimeouts> MissTimeoutDetails(int ProfileId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

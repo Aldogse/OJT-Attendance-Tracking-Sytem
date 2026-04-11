@@ -51,6 +51,9 @@ namespace Attendace_Tracking_Sytem.Repository
                 PhoneNumber = studentProfile.PhoneNumber,
                 School = studentProfile.School,
                 UserId = studentProfile.UserId,
+                Department = studentProfile.Department,
+                StartDate = studentProfile.StartDate,
+                EndDate = studentProfile.EndDate,
             };
 
             await _databaseContext.StudentsProfile.AddAsync(StudentOjtProfile);

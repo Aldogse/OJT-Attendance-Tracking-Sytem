@@ -1,4 +1,6 @@
-﻿using Attendace_Tracking_Sytem.ViewModels.HR_DASHBOARD_VM;
+﻿using Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS;
+using Attendace_Tracking_Sytem.Models.StudentProfiles;
+using Attendace_Tracking_Sytem.ViewModels.HR_DASHBOARD_VM;
 
 namespace Attendace_Tracking_Sytem.Interface
 {
@@ -7,5 +9,7 @@ namespace Attendace_Tracking_Sytem.Interface
         Task<HrDashBoardVM> HrDashboardInformation(string UserId);
         Task ApproveStudentWorkProfile(int Id);
         Task DenyStudentWorkProfile(int Id);
+        Task<List<StudentLogs>> MissedTimeOuts(DateOnly date);
+        Task<MissedTimeouts> MissTimeoutDetails(int ProfileId);
     }
 }

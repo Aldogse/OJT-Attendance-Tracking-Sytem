@@ -5,7 +5,7 @@ namespace Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM
 {
     public class StudentPendingWorkProfileVM
     {
-        public int Id { get; set; }
+        public int ProfileId { get; set; }
         public string FullName { get; set; } = null!;
         [Required]
         [StringLength(50)]

@@ -165,6 +165,8 @@ namespace Attendace_Tracking_Sytem.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ProfileId");
+
                     b.ToTable("MissedTimeouts");
                 });
 
@@ -425,6 +427,15 @@ namespace Attendace_Tracking_Sytem.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS.MissedTimeouts", b =>
+                {
+                    b.HasOne("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentProfile", "Profile")
+                        .WithMany()
+                        .HasForeignKey("ProfileId");
+
+                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentLogs", b =>
