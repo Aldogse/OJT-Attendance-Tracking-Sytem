@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Attendace_Tracking_Sytem</RootNamespace>
+    <UserSecretsId>768d28eb-5fb3-4372-b043-d5ef6deb62e9</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
