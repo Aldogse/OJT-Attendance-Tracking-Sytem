@@ -140,6 +140,11 @@ namespace Attendace_Tracking_Sytem.Controllers
                     return View(loginCredentials);
                 }
 
+                if (!user.ProfileCompleted)
+                {
+                    return RedirectToAction("StudentProfileForm","Student",new {UserId = user.Id});
+                }
+
                 var result = await _signInManager.PasswordSignInAsync(user.Email!, loginCredentials.Password,false,false);
 
                 if (result.Succeeded)
