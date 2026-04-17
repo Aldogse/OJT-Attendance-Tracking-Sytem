@@ -53,7 +53,7 @@ namespace Attendace_Tracking_Sytem.Repository
                 UserId = studentProfile.UserId,
                 Department = studentProfile.Department,
                 StartDate = studentProfile.StartDate,
-                EndDate = studentProfile.EndDate,
+                EndDate = studentProfile.EndDate,              
             };
 
             await _databaseContext.StudentsProfile.AddAsync(StudentOjtProfile);

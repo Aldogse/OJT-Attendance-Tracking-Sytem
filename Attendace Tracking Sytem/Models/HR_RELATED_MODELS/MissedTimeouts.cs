@@ -18,7 +18,9 @@ namespace Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS
         public StudentProfile Profile { get; set; }
 
         public DateOnly LogDate { get; set; }
-        public bool Missed { get; set; } = true;
+        public string? Explanation { get; set; }
+        public DateTime? Timeout {  get; set; }
+        public bool isApproved { get; set; } = false;
     }
 }
 

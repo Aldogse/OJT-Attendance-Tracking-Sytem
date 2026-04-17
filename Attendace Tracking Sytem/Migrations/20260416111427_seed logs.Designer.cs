@@ -4,6 +4,7 @@ using Attendace_Tracking_Sytem.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Attendace_Tracking_Sytem.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260416111427_seed logs")]
+    partial class seedlogs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,12 +169,6 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.Property<int?>("ProfileId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Timeout")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("isApproved")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ProfileId");
@@ -184,8 +181,7 @@ namespace Attendace_Tracking_Sytem.Migrations
                             Id = 1,
                             LogDate = new DateOnly(2026, 4, 16),
                             LogId = 2,
-                            ProfileId = 2,
-                            isApproved = false
+                            ProfileId = 2
                         });
                 });
 

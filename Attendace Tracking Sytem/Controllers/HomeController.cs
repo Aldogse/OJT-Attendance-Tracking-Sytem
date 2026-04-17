@@ -24,5 +24,11 @@ namespace Attendace_Tracking_Sytem.Controllers
             return View();
         }
 
+        public IActionResult Status500()
+        {
+            return View();
+        }
+            
+
     }
 }

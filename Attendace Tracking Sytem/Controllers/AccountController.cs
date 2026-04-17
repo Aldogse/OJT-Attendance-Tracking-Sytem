@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Attendace_Tracking_Sytem.ViewModels.Account_Pages_VM;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using Attendace_Tracking_Sytem.Database;
 
 namespace Attendace_Tracking_Sytem.Controllers
 {
@@ -14,14 +15,17 @@ namespace Attendace_Tracking_Sytem.Controllers
         private readonly UserManager<LogInCredentials> _userManager;
         private readonly SignInManager<LogInCredentials> _signInManager;
         private readonly ILogger<AccountController> _logger;
+        private readonly DatabaseContext _databaseContext;
 
         public AccountController(UserManager<LogInCredentials> userManager,
             SignInManager<LogInCredentials> signInManager,
-            ILogger<AccountController>logger)
+            ILogger<AccountController>logger,
+            DatabaseContext databaseContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _databaseContext = databaseContext;
         }
 
         [HttpGet]
@@ -51,6 +55,7 @@ namespace Attendace_Tracking_Sytem.Controllers
 
                 if (newUserCredentials.Succeeded)
                 {
+
                     var role = await _userManager.AddToRoleAsync(newUser,Enums.Roles.Student.ToString());
                     return RedirectToAction("StudentProfileForm", "Student",new { UserId = newUser.Id});
                 }
@@ -142,6 +147,13 @@ namespace Attendace_Tracking_Sytem.Controllers
 
                 if (!user.ProfileCompleted)
                 {
+                    var hr = await _databaseContext.HRProfile.FirstOrDefaultAsync(i => i.UserId == user.Id);
+
+                    if (hr != null)
+                    {
+                        return RedirectToAction("HrProfileForm", "Hr", new { UserId = user.Id });
+                    }
+
                     return RedirectToAction("StudentProfileForm","Student",new {UserId = user.Id});
                 }
 
@@ -151,6 +163,15 @@ namespace Attendace_Tracking_Sytem.Controllers
                 {
                     if (await _userManager.IsInRoleAsync(user, "Student"))
                     {
+                        //check if the profile has been approved, if not route success page
+                        var profile = await _databaseContext.StudentsProfile.Where(i => i.UserId == user.Id)
+                            .Select(i => i.Status).FirstOrDefaultAsync();
+
+                        if (profile.Equals(Status.Pending))
+                        {
+                            return RedirectToAction("Success","Student");
+                        }
+
                         return RedirectToAction("StudentDashboard", "Student",new {UserId = user.Id});
                     }
                     else if (await _userManager.IsInRoleAsync(user, "HR"))
@@ -179,7 +200,7 @@ namespace Attendace_Tracking_Sytem.Controllers
             try
             {
                await _signInManager.SignOutAsync();
-               return RedirectToAction("LogOut", "Account");
+               return RedirectToAction("Index","Home");
             }
             catch (Exception ex)
             {

@@ -10,5 +10,6 @@ namespace Attendace_Tracking_Sytem.Interface
         Task<StudentLogs> ClockIn(int? Id);
         Task<StudentLogs> ClockOut(int? Id);
         Task<StudentDashboardVM> GetStudentDashboardData(string UserId);
+        Task<MissedTimeouts> GetMissedLog(int ProfileId);
     }
 }

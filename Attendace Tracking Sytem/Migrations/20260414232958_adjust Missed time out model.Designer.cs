@@ -4,6 +4,7 @@ using Attendace_Tracking_Sytem.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Attendace_Tracking_Sytem.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260414232958_adjust Missed time out model")]
+    partial class adjustMissedtimeoutmodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,30 +166,17 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.Property<int>("LogId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("Missed")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("ProfileId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("Timeout")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("isApproved")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProfileId");
 
                     b.ToTable("MissedTimeouts");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            LogDate = new DateOnly(2026, 4, 16),
-                            LogId = 2,
-                            ProfileId = 2,
-                            isApproved = false
-                        });
                 });
 
             modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentLogs", b =>
@@ -220,17 +210,6 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.HasIndex("ProfileId");
 
                     b.ToTable("StudentLogs");
-
-                    b.HasData(
-                        new
-                        {
-                            LogId = 2,
-                            LogDate = new DateOnly(2026, 4, 16),
-                            ProfileId = 2,
-                            Status = 1,
-                            TimeIn = new DateTime(2024, 1, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
-                            TotalHours = 0m
-                        });
                 });
 
             modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentProfile", b =>

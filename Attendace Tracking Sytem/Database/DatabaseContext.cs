@@ -27,6 +27,32 @@ namespace Attendace_Tracking_Sytem.Database
                 .WithMany()
                 .HasForeignKey(i => i.ProfileId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<StudentLogs>()
+                .HasData(
+                  new StudentLogs()
+                  {
+                      ProfileId = 2,
+                      TimeIn = new DateTime(2024, 1, 1, 8, 0, 0),
+                      TimeOut = null,
+                      TotalHours = 0,
+                      Status = Enums.AttendanceStatus.Incomplete,
+                      LogDate = new DateOnly(2026, 4, 16),
+                      LogId = 2
+                  }
+                );
+
+            builder.Entity<MissedTimeouts>()
+                .HasData(
+                   new MissedTimeouts()
+                   {
+                       ProfileId = 2,
+                       LogDate = new DateOnly(2026, 4, 16),
+                       LogId = 2,    
+                       Id = 1
+                   }                
+                );
+
         }
     }
 }

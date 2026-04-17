@@ -89,11 +89,20 @@ namespace Attendace_Tracking_Sytem.Repository
                     .Select(i => i.ProfileId).FirstOrDefaultAsync();
 
             List<StudentLogs> logs = await _databaseContext.StudentLogs.Where(i => i.ProfileId == ProfileId).ToListAsync();
-          
+            List<MissedTimeouts> missed = await _databaseContext.MissedTimeouts.Where(i => i.ProfileId == ProfileId).ToListAsync();
+
             student.StudentLogs = logs;
+            student.MissedTimeouts = missed;
 
             return student;
 
+        }
+
+        public async Task<MissedTimeouts> GetMissedLog(int ProfileId)
+        {
+            MissedTimeouts? student = await _databaseContext.MissedTimeouts.FirstOrDefaultAsync(i => i.ProfileId == ProfileId);
+
+            return student;
         }
     }
 }

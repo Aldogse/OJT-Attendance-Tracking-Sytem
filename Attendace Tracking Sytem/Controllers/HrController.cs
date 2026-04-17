@@ -63,8 +63,21 @@ namespace Attendace_Tracking_Sytem.Controllers
                     return View(newProfile);
                 }
 
+                var exist = await _databaseContext.HRProfile.FirstOrDefaultAsync(i => i.UserId == newProfile.UserId);
+
+                if(exist != null)
+                {
+                    ModelState.AddModelError("", "User ID already exist!");
+                    return View(newProfile);
+                }
+
                 var profile = await _registrationRepository.HrProfileSetUp(newProfile);
-                return RedirectToAction("Index");
+
+                var account = await _databaseContext.Users.Where(i => i.Id == profile.UserId).FirstOrDefaultAsync();
+
+                account.ProfileCompleted = true;
+                await _databaseContext.SaveChangesAsync();
+                return RedirectToAction("HrDashBoard", "Hr", new { UserId = account.Id });
 
             }
             catch (Exception ex)
@@ -117,7 +130,8 @@ namespace Attendace_Tracking_Sytem.Controllers
                         Department = i.Profile.Department,
                         Fullname = $"{i.Profile.FirstName} {i.Profile.MiddleName} {i.Profile.LastName}",
                         Logdate = i.LogDate.ToShortDateString(),
-                        ProfileId = ProfileId
+                        ProfileId = ProfileId,
+                        Explanation = i.Explanation ?? ""
                     }).FirstOrDefaultAsync();
 
                 return View(studentData);
