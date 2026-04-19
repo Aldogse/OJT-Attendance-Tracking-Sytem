@@ -4,6 +4,7 @@ using Attendace_Tracking_Sytem.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Attendace_Tracking_Sytem.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260418073015_adjusted student log model change date time to timespan")]
+    partial class adjustedstudentlogmodelchangedatetimetotimespan
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -177,16 +180,6 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.HasIndex("ProfileId");
 
                     b.ToTable("MissedTimeouts");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            LogDate = new DateOnly(2026, 4, 20),
-                            LogId = 2,
-                            ProfileId = 2,
-                            isApproved = false
-                        });
                 });
 
             modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentLogs", b =>
@@ -220,17 +213,6 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.HasIndex("ProfileId");
 
                     b.ToTable("StudentLogs");
-
-                    b.HasData(
-                        new
-                        {
-                            LogId = 2,
-                            LogDate = new DateOnly(2026, 4, 20),
-                            ProfileId = 2,
-                            Status = 1,
-                            TimeIn = new TimeSpan(0, 8, 0, 0, 0),
-                            TotalHours = 0m
-                        });
                 });
 
             modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentProfile", b =>

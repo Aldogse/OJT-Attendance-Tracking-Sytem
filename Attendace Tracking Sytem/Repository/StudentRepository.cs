@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Threading.Tasks;
 using AspNetCoreGeneratedDocument;
 using Attendace_Tracking_Sytem.Database;
 using Attendace_Tracking_Sytem.Interface;
@@ -42,7 +43,7 @@ namespace Attendace_Tracking_Sytem.Repository
                 {
                     ProfileId = ProfileId,
                     LogDate = DateOnly.FromDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day)),
-                    TimeIn = DateTime.Now,
+                    TimeIn = DateTime.Now.TimeOfDay,
                     TimeOut = null
                 };
 
@@ -63,18 +64,19 @@ namespace Attendace_Tracking_Sytem.Repository
             var studentData = await _databaseContext.StudentLogs.Where(i => i.ProfileId == ProfileId && i.LogDate == date)
                 .FirstOrDefaultAsync();
 
-            studentData.TimeOut = DateTime.Now;
+            studentData.TimeOut = DateTime.Now.TimeOfDay;
             studentData.Status = Enums.AttendanceStatus.Complete;
 
-            TimeSpan totalHours = studentData.TimeOut.Value - studentData.TimeIn;
-            studentData.TotalHours = Math.Round((decimal)totalHours.TotalHours, 2);
+            studentData.TotalHours = (decimal)(studentData.TimeOut - studentData.TimeIn)?.TotalHours;
 
             return studentData;
         }
 
         //DASHBOARD DATA QUERIES
-        public async Task<StudentDashboardVM> GetStudentDashboardData(string UserId)
+        public async Task<StudentDashboardVM> GetStudentDashboardData(string UserId,int page)
         {
+            int size = 1;
+            DateTime date = DateTime.Now;
             StudentDashboardVM? student = await _databaseContext.StudentsProfile.Where(i => i.UserId == UserId)
                 .Select(i => new StudentDashboardVM
                 {
@@ -82,16 +84,17 @@ namespace Attendace_Tracking_Sytem.Repository
                     EndDate = i.EndDate.ToShortDateString(),
                     StartDate = i.StartDate.ToShortDateString(),
                     FullName = $"{i.FirstName} {i.MiddleName} {i.LastName}",
-                    HoursRendered = i.HoursRendered,
+                    HoursRendered = i.HoursRendered, 
+                    CurrentPage = page
                 }).FirstOrDefaultAsync();
+
 
                 int ProfileId = await _databaseContext.StudentsProfile.Where(i => i.UserId == UserId)
                     .Select(i => i.ProfileId).FirstOrDefaultAsync();
 
-            List<StudentLogs> logs = await _databaseContext.StudentLogs.Where(i => i.ProfileId == ProfileId).ToListAsync();
-            List<MissedTimeouts> missed = await _databaseContext.MissedTimeouts.Where(i => i.ProfileId == ProfileId).ToListAsync();
+            List<MissedTimeouts> missed = await _databaseContext.MissedTimeouts.Where(i => i.ProfileId == ProfileId
+            && i.isApproved == false).ToListAsync();
 
-            student.StudentLogs = logs;
             student.MissedTimeouts = missed;
 
             return student;
@@ -103,6 +106,32 @@ namespace Attendace_Tracking_Sytem.Repository
             MissedTimeouts? student = await _databaseContext.MissedTimeouts.FirstOrDefaultAsync(i => i.ProfileId == ProfileId);
 
             return student;
+        }
+
+        public async Task<List<StudentLogVM>> PaginatedStudentLog(string UserId, int page)
+        {
+           DateTime date = DateTime.Now;
+            int size = 5;
+
+            int ProfileId = await _databaseContext.StudentsProfile.Where(i => i.UserId == UserId).Select(i => i.ProfileId).FirstOrDefaultAsync();
+
+            List<StudentLogVM>? logs = await _databaseContext.StudentLogs.Where(i => i.ProfileId == ProfileId && i.LogDate.Month == date.Month
+            && i.LogDate.Year == date.Year)
+                .Select(i => new StudentLogVM
+                {
+                      Logdate = i.LogDate,
+                      Timein = i.TimeIn.ToString(@"hh\:mm"),
+                      Timeout  = i.TimeOut != null 
+                      ? i.TimeOut.Value.ToString(@"hh\:mm")
+                      : "--",
+                      TotalHours = i.TotalHours,
+                })
+                .OrderByDescending(i => i.Logdate)
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            return logs;
         }
     }
 }

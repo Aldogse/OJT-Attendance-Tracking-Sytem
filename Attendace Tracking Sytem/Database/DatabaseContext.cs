@@ -33,11 +33,11 @@ namespace Attendace_Tracking_Sytem.Database
                   new StudentLogs()
                   {
                       ProfileId = 2,
-                      TimeIn = new DateTime(2024, 1, 1, 8, 0, 0),
+                      TimeIn = new TimeSpan(8, 00, 00),
                       TimeOut = null,
                       TotalHours = 0,
                       Status = Enums.AttendanceStatus.Incomplete,
-                      LogDate = new DateOnly(2026, 4, 16),
+                      LogDate = new DateOnly(2026, 4, 20),
                       LogId = 2
                   }
                 );
@@ -47,10 +47,11 @@ namespace Attendace_Tracking_Sytem.Database
                    new MissedTimeouts()
                    {
                        ProfileId = 2,
-                       LogDate = new DateOnly(2026, 4, 16),
-                       LogId = 2,    
-                       Id = 1
-                   }                
+                       LogDate = new DateOnly(2026, 4, 20),
+                       LogId = 2,
+                       Id = 1,
+
+                   }
                 );
 
         }

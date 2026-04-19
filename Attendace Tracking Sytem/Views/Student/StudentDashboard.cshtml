@@ -133,9 +133,9 @@
                         @foreach (var log in Model.StudentLogs)
                         {
                             <tr>
-                                <td>@log.LogDate</td>
-                                <td>@log.TimeIn</td>
-                                <td>@log.TimeOut</td>
+                                <td>@log.Logdate</td>
+                                <td>@log.Timein</td>
+                                <td>@log.Timeout</td>
                                 <td>@log.TotalHours</td>
                             </tr>
                         }
@@ -143,6 +143,28 @@
                 </table>
 
             </div>
+            <nav>
+                <ul class="pagination justify-content-center">
+
+                    <!-- Previous -->
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link"   
+                        asp-action="StudenDashboard"
+                           asp-route-page="@(Model.CurrentPage - 1)">
+                            Previous
+                        </a>
+                    </li>
+
+                    <!-- Next -->
+                    <li class="page-item @(Model.StudentLogs.Count < 5 ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-route-page="@(Model.CurrentPage + 1)">
+                            Next
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
         </div>
 
         <!-- EXISTING TABLE ABOVE (NO CHANGE) -->

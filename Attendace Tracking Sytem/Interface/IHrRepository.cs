@@ -1,6 +1,7 @@
 ﻿using Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS;
 using Attendace_Tracking_Sytem.Models.StudentProfiles;
 using Attendace_Tracking_Sytem.ViewModels.HR_DASHBOARD_VM;
+using Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM;
 
 namespace Attendace_Tracking_Sytem.Interface
 {
@@ -10,6 +11,7 @@ namespace Attendace_Tracking_Sytem.Interface
         Task ApproveStudentWorkProfile(int Id);
         Task DenyStudentWorkProfile(int Id);
         Task<List<StudentLogs>> MissedTimeOuts(DateOnly date);
-        Task<MissedTimeouts> MissTimeoutDetails(int ProfileId);
+        Task<StudentMissedLogDetailsVM> MissTimeoutDetails(int ProfileId);
+        Task ApproveMissedLog(int ProfileId, DateOnly Logdate);
     }
 }

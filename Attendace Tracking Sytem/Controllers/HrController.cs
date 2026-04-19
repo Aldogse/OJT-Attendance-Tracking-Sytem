@@ -124,15 +124,8 @@ namespace Attendace_Tracking_Sytem.Controllers
         {
             try
             {
-                StudentMissedLogDetailsVM? studentData = await _databaseContext.MissedTimeouts.Where(i => i.ProfileId == ProfileId)
-                    .Select(i => new StudentMissedLogDetailsVM
-                    {
-                        Department = i.Profile.Department,
-                        Fullname = $"{i.Profile.FirstName} {i.Profile.MiddleName} {i.Profile.LastName}",
-                        Logdate = i.LogDate.ToShortDateString(),
-                        ProfileId = ProfileId,
-                        Explanation = i.Explanation ?? ""
-                    }).FirstOrDefaultAsync();
+                
+                StudentMissedLogDetailsVM? studentData = await _hrRepository.MissTimeoutDetails(ProfileId);
 
                 return View(studentData);
             }
@@ -140,6 +133,24 @@ namespace Attendace_Tracking_Sytem.Controllers
             {
                 _logger.LogError(message:$"Error:{ex.Message}");
                 return RedirectToAction("Error","Home");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ApprovedMissedLog(int ProfileId,DateOnly date)
+        {
+            try
+            {
+                await _hrRepository.ApproveMissedLog(ProfileId,date);
+
+                TempData["ApproveSuccess"] = "Successfully modifed!";
+
+                return RedirectToAction("HrDashboard","Hr");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(message: $"Error:{ex.Message}");
+                return RedirectToAction("Error", "Home");
             }
         }
     }

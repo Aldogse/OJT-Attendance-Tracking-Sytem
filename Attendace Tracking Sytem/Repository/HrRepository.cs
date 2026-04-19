@@ -3,6 +3,7 @@ using Attendace_Tracking_Sytem.Interface;
 using Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS;
 using Attendace_Tracking_Sytem.Models.StudentProfiles;
 using Attendace_Tracking_Sytem.ViewModels.HR_DASHBOARD_VM;
+using Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM;
 using Microsoft.EntityFrameworkCore;
 
 namespace Attendace_Tracking_Sytem.Repository
@@ -14,6 +15,21 @@ namespace Attendace_Tracking_Sytem.Repository
         public HrRepository(DatabaseContext databaseContext)
         {
             _databaseContext = databaseContext;
+        }
+
+        public async Task ApproveMissedLog(int ProfileId,DateOnly Logdate) 
+        {
+            var log = await _databaseContext.MissedTimeouts.FirstOrDefaultAsync(i => i.ProfileId == ProfileId && i.LogDate == Logdate);
+            var studentLogs = await _databaseContext.StudentLogs.Include(i => i.StudentProfile).FirstOrDefaultAsync(i => i.ProfileId == ProfileId && i.LogDate == Logdate);
+
+            studentLogs.TimeOut = log.Timeout;
+            studentLogs.TotalHours = (decimal)(studentLogs.TimeOut - studentLogs.TimeIn)?.TotalHours;
+            studentLogs.Status = Enums.AttendanceStatus.Complete;
+            studentLogs.StudentProfile.HoursRendered = studentLogs.TotalHours;
+            log.isApproved = true;
+
+            await _databaseContext.SaveChangesAsync();
+
         }
 
         public async Task ApproveStudentWorkProfile(int Id)
@@ -49,7 +65,10 @@ namespace Attendace_Tracking_Sytem.Repository
 
             var NumOfFinishingStudents = await _databaseContext.StudentsProfile.Where(i => i.EndDate.Month == date.Month).CountAsync();
             
-            var MissedLogs = await _databaseContext.MissedTimeouts.ToListAsync();
+            var MissedLogs = await _databaseContext.MissedTimeouts.Where(i => i.isApproved == false && i.LogDate.Month == date.Month 
+            && i.LogDate.Year == date.Year)
+                .OrderBy(i => i.LogDate)
+                .ToListAsync();
 
             return new HrDashBoardVM
             {
@@ -61,17 +80,32 @@ namespace Attendace_Tracking_Sytem.Repository
             };
         }
 
+        //BACKGROUND SERVICE 
         public async Task<List<StudentLogs>> MissedTimeOuts(DateOnly date)
         {
-            List<StudentLogs> missedTimeout = await _databaseContext.StudentLogs.Where(i => i.LogDate == date && i.TimeOut == null)
+            var logs = await _databaseContext.StudentLogs.Where(i => i.LogDate == date && i.TimeOut == null)
                 .ToListAsync();
 
-            return missedTimeout;
+            return logs;
         }
 
-        public Task<MissedTimeouts> MissTimeoutDetails(int ProfileId)
+        public async Task<StudentMissedLogDetailsVM> MissTimeoutDetails(int ProfileId)
         {
-            throw new NotImplementedException();
+            var log = await _databaseContext.MissedTimeouts
+                .Include(i => i.Profile).FirstOrDefaultAsync(i => i.ProfileId == ProfileId);
+
+            var logVm = new StudentMissedLogDetailsVM
+            {
+                Department = log.Profile.Department,
+                Fullname = $"{log.Profile.FirstName} {log.Profile.MiddleName} {log.Profile.LastName}",
+                Explanation = log.Explanation,
+                Logdate = log.LogDate,
+                Timeout = log.Timeout,
+                ProfileId = ProfileId
+            };
+
+            return logVm;
+                
         }
     }
 }

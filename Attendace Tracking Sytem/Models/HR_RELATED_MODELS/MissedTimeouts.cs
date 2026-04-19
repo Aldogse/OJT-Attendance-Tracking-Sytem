@@ -19,7 +19,7 @@ namespace Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS
 
         public DateOnly LogDate { get; set; }
         public string? Explanation { get; set; }
-        public DateTime? Timeout {  get; set; }
+        public TimeSpan? Timeout {  get; set; }
         public bool isApproved { get; set; } = false;
     }
 }

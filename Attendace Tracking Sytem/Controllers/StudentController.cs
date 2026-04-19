@@ -171,18 +171,19 @@ namespace Attendace_Tracking_Sytem.Controllers
 
         //STUDENT DASHBOARD
         [HttpGet]
-        public async Task<IActionResult> StudentDashboard()
+        public async Task<IActionResult> StudentDashboard(int page = 1)
         {
             try
             {
                 var UserData = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
                 if(UserData == null)
                 {
                     return RedirectToAction("Account", "LoginPage");
                 }
 
-                var Student = await _studentRepository.GetStudentDashboardData(UserData);
+                var Student = await _studentRepository.GetStudentDashboardData(UserData,page);
+                Student.StudentLogs = await _studentRepository.PaginatedStudentLog(UserData,Student.CurrentPage);
+                
                 return View(Student);
             }
             catch (Exception ex)
@@ -202,9 +203,10 @@ namespace Attendace_Tracking_Sytem.Controllers
                     {
                         Department = i.Profile.Department,
                         Fullname = $"{i.Profile.FirstName} {i.Profile.MiddleName} {i.Profile.LastName}",
-                        Logdate = i.LogDate.ToShortDateString(),
+                        Logdate = i.LogDate,
                         Explanation = i.Explanation,  
-                        ProfileId = ProfileId,
+                        ProfileId = ProfileId, 
+                        Timeout = i.Timeout,
                     }).FirstOrDefaultAsync();
 
                 return View(TimeoutDetails);
