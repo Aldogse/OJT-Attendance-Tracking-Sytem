@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Attendace_Tracking_Sytem.Enums;
 
 namespace Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM
 {
@@ -26,8 +27,7 @@ namespace Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM
         public string PhoneNumber { get; set; }
 
         [Required]
-        [StringLength(50)]
-        public string Department { get; set; } = null!;
+        public Departments Department { get; set; }
 
         [Required]
         public DateOnly StartDate { get; set; }

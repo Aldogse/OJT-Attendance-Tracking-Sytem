@@ -4,6 +4,7 @@ using Attendace_Tracking_Sytem.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Attendace_Tracking_Sytem.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260420215900_remove")]
+    partial class remove
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -154,8 +157,8 @@ namespace Attendace_Tracking_Sytem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ApproverProfileId")
-                        .HasColumnType("int");
+                    b.Property<string>("ApproverUserId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Explanation")
                         .HasColumnType("nvarchar(max)");
@@ -175,9 +178,8 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.Property<TimeSpan?>("Timeout")
                         .HasColumnType("time");
 
-                    b.Property<string>("status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -202,9 +204,8 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.Property<int?>("ProfileId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<TimeSpan>("TimeIn")
                         .HasColumnType("time");

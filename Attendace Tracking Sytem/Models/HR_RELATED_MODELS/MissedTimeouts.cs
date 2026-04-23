@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using Attendace_Tracking_Sytem.Enums;
+using Attendace_Tracking_Sytem.Models.HR_Profiles;
 using Attendace_Tracking_Sytem.Models.StudentProfiles;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
@@ -15,12 +17,17 @@ namespace Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS
 
         [ValidateNever]
         [JsonIgnore]
-        public StudentProfile Profile { get; set; }
+        public StudentProfile? Profile { get; set; }
 
         public DateOnly LogDate { get; set; }
         public string? Explanation { get; set; }
         public TimeSpan? Timeout {  get; set; }
-        public bool isApproved { get; set; } = false;
+        public MissedLogStatus status { get; set; } = MissedLogStatus.Pending;
+        public int? ApproverProfileId { get; set; }
+
+        [ValidateNever]
+        [JsonIgnore]
+        public HRProfile? HrProfile { get; set; }
     }
 }
 

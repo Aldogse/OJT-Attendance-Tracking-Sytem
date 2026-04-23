@@ -5,6 +5,7 @@ using Attendace_Tracking_Sytem.Database;
 using Attendace_Tracking_Sytem.Interface;
 using Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS;
 using Attendace_Tracking_Sytem.Models.StudentProfiles;
+using Attendace_Tracking_Sytem.ViewModels.HR_PAGES_VM;
 using Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM;
 using Microsoft.EntityFrameworkCore;
 
@@ -93,7 +94,7 @@ namespace Attendace_Tracking_Sytem.Repository
                     .Select(i => i.ProfileId).FirstOrDefaultAsync();
 
             List<MissedTimeouts> missed = await _databaseContext.MissedTimeouts.Where(i => i.ProfileId == ProfileId
-            && i.isApproved == false).ToListAsync();
+            && i.status == Enums.MissedLogStatus.Pending).ToListAsync();
 
             student.MissedTimeouts = missed;
 

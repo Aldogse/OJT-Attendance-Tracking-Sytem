@@ -95,56 +95,6 @@
             </div>
         </div>
 
-        <!-- MISSED LOGS -->
-        <div class="card dashboard-card">
-            <div class="card-body">
-
-                <h5 class="fw-bold text-danger mb-3">
-                    Missed Timeouts (@Model.MissedTimeouts?.Count())
-                </h5>
-
-                @if (Model.MissedTimeouts != null && Model.MissedTimeouts.Any())
-                {
-                    <table class="table table-hover align-middle">
-                        <thead>
-                            <tr>
-                                <th>Log ID</th>
-                                <th>Profile</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @foreach (var log in Model.MissedTimeouts)
-                            {
-                                <tr>
-                                    <td>@log.LogId</td>
-                                    <td>@log.ProfileId</td>
-                                    <td>@log.LogDate.ToString("MMMM dd, yyyy")</td>
-                                    <td><span class="badge bg-danger">Missed</span></td>
-                                    <td>
-                                        <a asp-action="MissedLogDetails"
-                                           asp-controller="Hr"
-                                           asp-route-ProfileId="@log.ProfileId"
-                                           class="btn btn-sm btn-outline-dark">
-                                            Details
-                                        </a>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-                else
-                {
-                    <div class="alert alert-success">No missed logs.</div>
-                }
-
-            </div>
-        </div>
-
     </div>
 
 </body>

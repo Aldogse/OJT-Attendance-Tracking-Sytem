@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Attendace_Tracking_Sytem.Enums;
 
 namespace Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM
 {
@@ -6,7 +7,7 @@ namespace Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM
     {
         public string Fullname { get; set; }
         public int ProfileId { get; set; }
-        public string Department { get; set; }
+        public Departments Department { get; set; }
         public DateOnly Logdate { get; set; }
 
         [StringLength(250)]

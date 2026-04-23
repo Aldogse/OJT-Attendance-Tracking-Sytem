@@ -28,32 +28,41 @@ namespace Attendace_Tracking_Sytem.Database
                 .HasForeignKey(i => i.ProfileId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Entity<StudentProfile>()
+                .Property(i => i.Department)
+                .HasConversion<string>();
+
+            builder.Entity<MissedTimeouts>().
+                Property(i => i.status)
+                .HasConversion<string>();
+
             builder.Entity<StudentLogs>()
-                .HasData(
-                  new StudentLogs()
-                  {
-                      ProfileId = 2,
-                      TimeIn = new TimeSpan(8, 00, 00),
-                      TimeOut = null,
-                      TotalHours = 0,
-                      Status = Enums.AttendanceStatus.Incomplete,
-                      LogDate = new DateOnly(2026, 4, 20),
-                      LogId = 2
-                  }
-                );
+                .Property(i => i.Status)
+                .HasConversion<string>();
 
-            builder.Entity<MissedTimeouts>()
-                .HasData(
-                   new MissedTimeouts()
-                   {
-                       ProfileId = 2,
-                       LogDate = new DateOnly(2026, 4, 20),
-                       LogId = 2,
-                       Id = 1,
+            //builder.Entity<StudentLogs>().HasData(
+            //      new StudentLogs()
+            //      {
+            //          ProfileId = 2,
+            //          TimeIn = new TimeSpan(8, 00, 00),
+            //          TimeOut = null,
+            //          TotalHours = 0,
+            //          Status = Enums.AttendanceStatus.Incomplete,
+            //          LogDate = new DateOnly(2026, 4, 21),
+            //          LogId = 2
+            //      }
+            //    );
 
-                   }
-                );
-
+            //builder.Entity<MissedTimeouts>()
+            //    .HasData(
+            //       new MissedTimeouts()
+            //       {
+            //           ProfileId = 2,
+            //           LogDate = new DateOnly(2026, 4, 21),
+            //           LogId = 2,
+            //           Id = 1,
+            //       }
+            //    );
         }
     }
 }

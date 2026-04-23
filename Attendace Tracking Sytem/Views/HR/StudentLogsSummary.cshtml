@@ -1,0 +1,202 @@
+﻿@model Attendace_Tracking_Sytem.ViewModels.HR_PAGES_VM.StudentLogSummaryVM
+
+@{
+    Layout = "~/Views/Shared/HrSidebarLayout.cshtml";
+    int pageSize = ViewBag.PageSize ?? 10;
+    int logCount = Model.StudentLogs?.Count() ?? 0;
+}
+
+<div class="container-fluid py-4 px-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">Attendance Logs</h3>
+            <small class="text-muted">Student daily attendance summary</small>
+        </div>
+
+        <a asp-action="Students" asp-controller="Hr" class="btn btn-outline-secondary">
+            ← Back
+        </a>
+    </div>
+
+    <!-- STUDENT SUMMARY -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <small class="text-muted">Full Name</small>
+                    <div class="fw-semibold fs-5">@Model.Fullname</div>
+                </div>
+
+                <div class="col-md-4">
+                    <small class="text-muted">Department</small>
+                    <div class="fw-semibold fs-5">@Model.Department</div>
+                </div>
+
+                <div class="col-md-4">
+                    <small class="text-muted">Shift</small>
+                    <div class="fw-semibold fs-5">
+                        @Model.ShiftStart.ToString("hh\\:mm") - @Model.ShiftEnd.ToString("hh\\:mm")
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- LOGS TABLE -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <h5 class="fw-bold mb-3">Daily Logs</h5>
+
+            <div class="table-responsive">
+                <form asp-action="StudentLogsSummary" method="get" class="mb-4">
+
+                    <input type="hidden" name="ProfileId" value="@ViewBag.ProfileId" />
+
+                    <div class="card shadow-sm">
+                        <div class="card-body d-flex flex-wrap gap-3 align-items-end">
+
+                            <!-- START DATE -->
+                            <div>
+                                <label class="form-label small text-muted">Start Date</label>
+                                <input type="date"
+                                       name="StartDate"
+                                       value="@ViewBag.StartDate"
+                                       class="form-control">
+                            </div>
+
+                            <!-- END DATE -->
+                            <div>
+                                <label class="form-label small text-muted">End Date</label>
+                                <input type="date"
+                                       name="EndDate"
+                                       value="@ViewBag.EndDate"
+                                       class="form-control">
+                            </div>
+
+                            <!-- SUBMIT -->
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    Apply Filter
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </form>
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Time In</th>
+                            <th>Time Out</th>
+                            <th>Total Hours</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model.StudentLogs != null && Model.StudentLogs.Any())
+                        {
+                            foreach (var log in Model.StudentLogs)
+                            {
+                                <tr>
+                                    <td>
+                                        @log.Logdate.ToString("MMM dd, yyyy")
+                                        <br />
+                                        <small class="text-muted">@log.Logdate.DayOfWeek</small>
+                                    </td>
+
+                                    <td>
+                                        <span class="fw-semibold">@log.Timein</span>
+                                    </td>
+
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(log.Timeout) && log.Timeout != "--")
+                                        {
+                                            <span class="fw-semibold">@log.Timeout</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger">Missing</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (log.TotalHours.HasValue)
+                                        {
+                                            <span class="badge bg-success-subtle text-success px-3 py-2">
+                                                @log.TotalHours hrs
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">--</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-4">
+                                    <div class="text-muted">No logs available</div>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
+
+                        <!-- PREVIOUS -->
+                        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="StudentLogsSummary"
+                               asp-route-ProfileId="@ViewBag.ProfileId"
+                               asp-route-page="@(ViewBag.CurrentPage - 1)"
+                               asp-route-StartDate="@ViewBag.StartDate"
+                               asp-route-EndDate="@ViewBag.EndDate">
+                                ← Previous
+                            </a>
+                        </li>
+
+                        <!-- CURRENT -->
+                        <li class="page-item active">
+                            <span class="page-link">
+                                @ViewBag.CurrentPage
+                            </span>
+                        </li>
+
+                        <!-- NEXT -->
+                        <li class="page-item @(logCount < pageSize ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="StudentLogsSummary"
+                               asp-route-ProfileId="@ViewBag.ProfileId"
+                               asp-route-page="@(ViewBag.CurrentPage + 1)"
+                               asp-route-StartDate="@ViewBag.StartDate"
+                               asp-route-EndDate="@ViewBag.EndDate">
+                                Next →
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>

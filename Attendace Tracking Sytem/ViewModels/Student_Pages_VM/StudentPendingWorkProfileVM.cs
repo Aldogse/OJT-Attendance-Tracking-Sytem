@@ -9,7 +9,7 @@ namespace Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM
         public string FullName { get; set; } = null!;
         [Required]
         [StringLength(50)]
-        public string Department { get; set; } = null!;
+        public Departments Department { get; set; }
 
         [Required]
         public DateOnly StartDate { get; set; }

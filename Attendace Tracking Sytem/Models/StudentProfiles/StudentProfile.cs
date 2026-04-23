@@ -47,7 +47,7 @@ namespace Attendace_Tracking_Sytem.Models.StudentProfiles
 
         [Required]
         [StringLength(50)]
-        public string Department { get; set; } = null!;
+        public Departments Department { get; set; }
 
         [Required]
         public DateOnly StartDate { get; set; }
