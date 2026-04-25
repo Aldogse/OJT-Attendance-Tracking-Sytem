@@ -101,6 +101,11 @@ namespace Attendace_Tracking_Sytem.Controllers
                     return RedirectToAction("HrProfileForm","Hr",new {UserId = newUser.Id});
                 }
 
+                if (!newUser.ProfileCompleted)
+                {
+                    return RedirectToAction("HrProfileForm", "Hr",new {UserId = newUser.Id});
+                }
+
                 foreach (var err in newUserCredentials.Errors)
                 {
                     ModelState.AddModelError("", err.Description);
