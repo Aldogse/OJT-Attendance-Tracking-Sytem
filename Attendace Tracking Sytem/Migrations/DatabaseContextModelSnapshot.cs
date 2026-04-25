@@ -154,19 +154,34 @@ namespace Attendace_Tracking_Sytem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("ApproverProfileId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Explanation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("HrProfileProfileId")
+                        .HasColumnType("int");
+
                     b.Property<DateOnly>("LogDate")
                         .HasColumnType("date");
 
                     b.Property<int>("LogId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Missed")
-                        .HasColumnType("bit");
-
                     b.Property<int?>("ProfileId")
                         .HasColumnType("int");
 
+                    b.Property<TimeSpan?>("Timeout")
+                        .HasColumnType("time");
+
+                    b.Property<string>("status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("HrProfileProfileId");
 
                     b.HasIndex("ProfileId");
 
@@ -187,14 +202,15 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.Property<int?>("ProfileId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("TimeIn")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan>("TimeIn")
+                        .HasColumnType("time");
 
-                    b.Property<DateTime?>("TimeOut")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan?>("TimeOut")
+                        .HasColumnType("time");
 
                     b.Property<decimal?>("TotalHours")
                         .HasColumnType("decimal(18,2)");
@@ -434,9 +450,15 @@ namespace Attendace_Tracking_Sytem.Migrations
 
             modelBuilder.Entity("Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS.MissedTimeouts", b =>
                 {
-                    b.HasOne("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentProfile", "Profile")
+                    b.HasOne("Attendace_Tracking_Sytem.Models.HR_Profiles.HRProfile", "HrProfile")
                         .WithMany()
+                        .HasForeignKey("HrProfileProfileId");
+
+                    b.HasOne("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentProfile", "Profile")
+                        .WithMany("MissedLogs")
                         .HasForeignKey("ProfileId");
+
+                    b.Navigation("HrProfile");
 
                     b.Navigation("Profile");
                 });
@@ -511,6 +533,11 @@ namespace Attendace_Tracking_Sytem.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentProfile", b =>
+                {
+                    b.Navigation("MissedLogs");
                 });
 #pragma warning restore 612, 618
         }

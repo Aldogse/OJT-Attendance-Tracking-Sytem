@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Attendace_Tracking_Sytem.Enums;
 using Attendace_Tracking_Sytem.Models.Account;
+using Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.Primitives;
@@ -46,7 +47,7 @@ namespace Attendace_Tracking_Sytem.Models.StudentProfiles
 
         [Required]
         [StringLength(50)]
-        public string Department { get; set; } = null!;
+        public Departments Department { get; set; }
 
         [Required]
         public DateOnly StartDate { get; set; }
@@ -68,5 +69,6 @@ namespace Attendace_Tracking_Sytem.Models.StudentProfiles
         [JsonIgnore]
         [ValidateNever]
         public LogInCredentials User { get; set; }
+        public List<MissedTimeouts>?MissedLogs { get; set; }
     }
 }

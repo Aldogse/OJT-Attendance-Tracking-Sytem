@@ -1,0 +1,128 @@
+﻿@model Attendace_Tracking_Sytem.ViewModels.HR_PAGES_VM.StudentsDetailsVM
+
+@{
+    Layout = "~/Views/Shared/HrSidebarLayout.cshtml";
+}
+
+<div class="container-fluid py-4 px-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">Student Profile</h3>
+            <small class="text-muted">HR overview of student information</small>
+        </div>
+
+        <a asp-action="Students" asp-controller="Hr" class="btn btn-outline-secondary">
+            ← Back
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- LEFT SIDE -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm text-center p-4 h-100">
+
+                <!-- Avatar -->
+                <div class="mb-3">
+                    <div class="rounded-circle bg-light d-inline-flex justify-content-center align-items-center"
+                         style="width: 90px; height: 90px;">
+                        <span class="fw-bold fs-3 text-secondary">
+                            @Model.Fullname.Substring(0, 1)
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Name -->
+                <h5 class="fw-bold">@Model.Fullname</h5>
+                <small class="text-muted">Student ID: @Model.StudentId</small>
+
+                <hr>
+
+                <!-- CONTACT -->
+                <div class="text-start mt-3">
+
+                    <div class="mb-3">
+                        <small class="text-muted">Email</small>
+                        <div class="fw-semibold">@Model.Email</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <small class="text-muted">Phone Number</small>
+                        <div class="fw-semibold">@Model.PhoneNumber</div>
+                    </div>
+
+                    <div>
+                        <small class="text-muted">Age</small>
+                        <div class="fw-semibold">@Model.Age</div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="col-lg-8">
+
+            <!-- WORK DETAILS -->
+            <div class="card shadow-sm mb-4 p-4">
+
+                <h6 class="fw-bold mb-3">Work Details</h6>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <small class="text-muted">Department</small>
+                        <div class="fw-semibold">@Model.Department</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <small class="text-muted">Shift</small>
+                        <div class="fw-semibold">
+                            @Model.ShiftStart.ToString("hh\\:mm") - @Model.ShiftEnd.ToString("hh\\:mm")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <small class="text-muted">Start Date</small>
+                        <div class="fw-semibold">@Model.StartDate.ToString("MMM dd, yyyy")</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <small class="text-muted">End Date</small>
+                        <div class="fw-semibold">@Model.EndDate.ToString("MMM dd, yyyy")</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- HOURS / PROGRESS -->
+            <div class="card shadow-sm p-4">
+
+                <h6 class="fw-bold mb-3">OJT Progress</h6>
+
+                <div class="d-flex justify-content-between">
+                    <span class="fw-semibold">
+                        @(Model.HoursRendered ?? 0) / @Model.RequiredHours hrs
+                    </span>
+                    <span class="text-muted">Completion</span>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress mt-3" style="height: 12px;">
+                    <div class="progress-bar bg-success"
+                         role="progressbar"
+                         style="width: @((Model.RequiredHours == 0 ? 0 : ((Model.HoursRendered ?? 0) / Model.RequiredHours) * 100))%;">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

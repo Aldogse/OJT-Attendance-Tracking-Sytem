@@ -33,6 +33,11 @@ namespace Attendace_Tracking_Sytem.Controllers
             return View();
         }
 
+        public IActionResult Success()
+        {
+            return View();
+        }
+
         [HttpGet]
         public IActionResult StudentProfileForm(string UserId)
         {
@@ -68,11 +73,18 @@ namespace Attendace_Tracking_Sytem.Controllers
                     return View(StudentProfile);
                 }
                 var newStudent = await _registrationRepository.StudentProfileSetUp(StudentProfile);
-                return RedirectToAction("Success");            
+
+                var profile = await _databaseContext.Users.Where(i => i.Id == newStudent.UserId).FirstOrDefaultAsync();
+
+                profile.ProfileCompleted = true;
+                await _databaseContext.SaveChangesAsync();
+                
+                return RedirectToAction("Success","Student");            
             }
             catch (Exception ex)
             {
-                return StatusCode(500,ex.Message);
+                _logger.LogError(message:$"Error:{ex.Message}");
+                return RedirectToAction("Status500", "Home");
             }
         }
 
@@ -103,7 +115,7 @@ namespace Attendace_Tracking_Sytem.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(message:$"Error: {ex.Message}");
-                return RedirectToAction("Error","Home");
+                return RedirectToAction("Status500", "Home");
             }
         }
 
@@ -130,7 +142,7 @@ namespace Attendace_Tracking_Sytem.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(message: $"Error: {ex.Message}");
-                return RedirectToAction("Error", "Home");
+                return RedirectToAction("Status500", "Home");
             }
         }
 
@@ -153,30 +165,77 @@ namespace Attendace_Tracking_Sytem.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(message: $"Error: {ex.Message}");
-                return RedirectToAction("Error", "Home");
+                return RedirectToAction("Status500", "Home");
             }
         }
 
         //STUDENT DASHBOARD
         [HttpGet]
-        public async Task<IActionResult> StudentDashboard()
+        public async Task<IActionResult> StudentDashboard(int page = 1)
         {
             try
             {
                 var UserData = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
                 if(UserData == null)
                 {
                     return RedirectToAction("Account", "LoginPage");
                 }
 
-                var Student = await _studentRepository.GetStudentDashboardData(UserData);
+                var Student = await _studentRepository.GetStudentDashboardData(UserData,page);
+                Student.StudentLogs = await _studentRepository.PaginatedStudentLog(UserData,Student.CurrentPage);
+                
                 return View(Student);
             }
             catch (Exception ex)
             {
                 _logger.LogError(message:$"Error: {ex.Message}");
-                return RedirectToAction("Error","Home");
+                return RedirectToAction("Status500", "Home");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MissedTimeoutDetails(int ProfileId)
+        {
+            try
+            {
+                var TimeoutDetails = await _databaseContext.MissedTimeouts.Include(i => i.Profile).Where(i => i.ProfileId == ProfileId)
+                    .Select(i => new StudentMissedLogDetailsVM
+                    {
+                        Department = i.Profile.Department,
+                        Fullname = $"{i.Profile.FirstName} {i.Profile.MiddleName} {i.Profile.LastName}",
+                        Logdate = i.LogDate,
+                        Explanation = i.Explanation,  
+                        ProfileId = ProfileId, 
+                        Timeout = i.Timeout,
+                    }).FirstOrDefaultAsync();
+
+                return View(TimeoutDetails);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(message:$"Error: {ex.Message}");
+                return RedirectToAction("Status500", "Home");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MissedTimeoutDetails(StudentMissedLogDetailsVM exp)
+        {
+            try
+            {
+                var MissedLog = await _studentRepository.GetMissedLog(exp.ProfileId);
+
+                MissedLog.Explanation = exp.Explanation;
+                MissedLog.Timeout = exp.Timeout;
+                await _databaseContext.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Explanation submitted successfully!";
+                return RedirectToAction("StudentDashboard","Student"); ;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(message: $"Error: {ex.Message}");
+                return RedirectToAction("Status500", "Home");
             }
         }
     }

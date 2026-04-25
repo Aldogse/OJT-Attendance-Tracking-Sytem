@@ -18,9 +18,9 @@ namespace Attendace_Tracking_Sytem.Models.StudentProfiles
         [Required]
         public DateOnly LogDate { get; set; }
 
-        public DateTime TimeIn { get; set; }
+        public TimeSpan TimeIn { get; set; }
 
-        public DateTime? TimeOut { get; set; } = null;
+        public TimeSpan? TimeOut { get; set; } = null;
 
         public decimal? TotalHours { get; set; }
         public AttendanceStatus Status { get; set; } = AttendanceStatus.Incomplete;

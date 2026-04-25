@@ -1,0 +1,73 @@
+﻿body {
+    background: #f5f7fb;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 240px;
+    height: 100vh;
+    position: fixed;
+    background: #111827;
+    color: white;
+    padding: 20px;
+}
+
+    .sidebar h4 {
+        margin-bottom: 30px;
+    }
+
+    .sidebar a {
+        display: flex;
+        gap: 10px;
+        padding: 10px;
+        border-radius: 8px;
+        color: #cbd5e1;
+        text-decoration: none;
+        margin-bottom: 8px;
+    }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #1e293b;
+            color: white;
+        }
+
+/* MAIN */
+.main {
+    margin-left: 240px;
+    padding: 20px;
+}
+
+/* TOPBAR */
+.topbar {
+    background: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* CARDS */
+.dashboard-card {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+}
+
+.stat-title {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* TABLE */
+.table thead {
+    background: #f1f3f5;
+}
+
+.badge {
+    font-size: 0.75rem;
+}

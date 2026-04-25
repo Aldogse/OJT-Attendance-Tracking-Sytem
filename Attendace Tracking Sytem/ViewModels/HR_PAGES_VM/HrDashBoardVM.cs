@@ -9,7 +9,6 @@ namespace Attendace_Tracking_Sytem.ViewModels.HR_DASHBOARD_VM
         public int NumberOfActiveStudents { get; set; }
         public List<StudentProfile>? PendingStudents { get; set; }
         public int FinishingStudents { get; set; }
-        public List<MissedTimeouts>? MissedTimeouts { get; set; }
 
     }
 }
