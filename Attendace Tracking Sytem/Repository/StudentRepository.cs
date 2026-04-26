@@ -241,5 +241,10 @@ namespace Attendace_Tracking_Sytem.Repository
             await _databaseContext.SaveChangesAsync();
             return true;
         }
+
+        public Task<bool> UploadProfilePicture(IFormFile file, int ProfileId, string? ext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
