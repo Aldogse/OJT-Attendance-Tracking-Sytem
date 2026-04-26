@@ -70,5 +70,6 @@ namespace Attendace_Tracking_Sytem.Models.StudentProfiles
         [ValidateNever]
         public LogInCredentials User { get; set; }
         public List<MissedTimeouts>?MissedLogs { get; set; }
+
     }
 }

@@ -4,6 +4,7 @@ using Attendace_Tracking_Sytem.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Attendace_Tracking_Sytem.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260425190334_added new model for Student requirements")]
+    partial class addednewmodelforStudentrequirements
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -318,9 +321,6 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.Property<string>("MemorandumOfAgreementImagePath")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Message")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("NBI")
                         .HasColumnType("bit");
 
@@ -336,43 +336,11 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.Property<int>("StudentProfileId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Verified")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
 
                     b.HasIndex("StudentProfileId");
 
                     b.ToTable("StudentRequirements");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            MemorandumOfAgreement = false,
-                            NBI = false,
-                            StudentId = false,
-                            StudentProfileId = 5,
-                            Verified = false
-                        },
-                        new
-                        {
-                            Id = 2,
-                            MemorandumOfAgreement = false,
-                            NBI = false,
-                            StudentId = false,
-                            StudentProfileId = 4,
-                            Verified = false
-                        },
-                        new
-                        {
-                            Id = 3,
-                            MemorandumOfAgreement = false,
-                            NBI = false,
-                            StudentId = false,
-                            StudentProfileId = 3,
-                            Verified = false
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

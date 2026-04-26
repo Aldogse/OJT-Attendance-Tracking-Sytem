@@ -5,6 +5,7 @@ using Attendace_Tracking_Sytem.Models.StudentProfiles;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace Attendace_Tracking_Sytem.Database
 {
     public class DatabaseContext : IdentityDbContext<LogInCredentials>
@@ -17,6 +18,7 @@ namespace Attendace_Tracking_Sytem.Database
         public DbSet<HRProfile> HRProfile { get; set; }
         public DbSet<StudentLogs> StudentLogs { get; set; }
         public DbSet<MissedTimeouts> MissedTimeouts { get; set; }
+        public DbSet<StudentRequirements> StudentRequirements { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -26,6 +28,12 @@ namespace Attendace_Tracking_Sytem.Database
                 .HasOne(i => i.StudentProfile)
                 .WithMany()
                 .HasForeignKey(i => i.ProfileId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<StudentRequirements>()
+                .HasOne(i => i.StudentProfile)
+                .WithMany()
+                .HasForeignKey(i => i.StudentProfileId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<StudentProfile>()
@@ -39,6 +47,26 @@ namespace Attendace_Tracking_Sytem.Database
             builder.Entity<StudentLogs>()
                 .Property(i => i.Status)
                 .HasConversion<string>();
+
+
+            builder.Entity<StudentRequirements>()
+                .HasData(new StudentRequirements
+                {
+                    Id = 1,
+                   StudentProfileId = 5,
+
+                }, new StudentRequirements
+                {
+                    Id = 2,
+                    StudentProfileId = 4,
+                },
+                new StudentRequirements
+                {
+                    Id = 3,
+                    StudentProfileId = 3,
+                }
+                );
+
 
             //builder.Entity<StudentLogs>().HasData(
             //      new StudentLogs()

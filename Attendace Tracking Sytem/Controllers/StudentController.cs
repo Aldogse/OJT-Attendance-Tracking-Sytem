@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Runtime.Versioning;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Attendace_Tracking_Sytem.Database;
 using Attendace_Tracking_Sytem.Interface;
@@ -7,6 +8,8 @@ using Attendace_Tracking_Sytem.Models.StudentProfiles;
 using Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
+using Microsoft.Identity.Client;
 
 namespace Attendace_Tracking_Sytem.Controllers
 {
@@ -231,6 +234,165 @@ namespace Attendace_Tracking_Sytem.Controllers
 
                 TempData["SuccessMessage"] = "Explanation submitted successfully!";
                 return RedirectToAction("StudentDashboard","Student"); ;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(message: $"Error: {ex.Message}");
+                return RedirectToAction("Status500", "Home");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadNBI(IFormFile file,int ProfileId)
+        {
+            try
+            {
+                //CHECK IF FILE NULL OR EMPTY
+                if (file == null || file.Length < 0)
+                {
+                    TempData["ErrorMessage"] = "No file selected!";
+                    return View();
+                }
+
+                var allowedExt = new[] { ".jpg", ".jpeg", ".png" };
+                var fileExt = Path.GetExtension(file.FileName).ToLower();
+
+                if(!allowedExt.Contains(fileExt))
+                {
+                    TempData["ErrorMessage"] = "Invalid file type! Only .jpg, .jpeg, and .png are allowed.";
+                    return View();
+                }
+
+                //VALID Multipurpose Internet Mail Extensions
+                var allowedMimeTypes = new[] { "image/jpeg", "image/png" };
+
+                //CHECK IF YUNG CONTENT TYPE NG FILE AY VALID
+                if(!allowedMimeTypes.Contains(file.ContentType))
+                {
+                    TempData["ErrorMessage"] = "Invalid file type! Only JPEG and PNG images are allowed.";
+                    return View();
+                }
+
+                //CHECK KUNG YUNG FILE SIZE AY 2 MB LANG 
+                if(file.Length > 2 * 1024 * 1024)
+                {
+                    TempData["ErrorMessage"] = "File size exceed the maximum Limit.";
+                    return View();
+                }
+
+                bool uploadResult =  await _studentRepository.UploadNBI(ProfileId, file, fileExt);
+
+                if(!uploadResult)
+                {
+                    TempData["UploadError"]  = "Failed to upload NBI Clearance. Please try again.";
+                    return View();
+                }
+
+                TempData["SuccessMessage"] = "NBI Clearance uploaded successfully!";
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(message:$"Error: {ex.Message}");
+                return RedirectToAction("Status500","Home");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadMOA(IFormFile file, int profileId)
+        {
+            try
+            {
+                //check if file ay may laman
+                if(file == null || file.Length == 0)
+                {
+                    TempData["ErrorMessage"] = "No file selected!";
+                    return View();
+                }
+
+                //Valid format ng file 
+                var allowedExt = new[] { ".jpg", ".jpeg", ".png" };
+
+                //CHECK KUNG TAMA YUNG FILE Format
+                var fileExt = Path.GetExtension(file.FileName).ToLower();
+
+                if (!allowedExt.Contains(fileExt))
+                {
+                    TempData["ErrorMessage"] = "Invalid file type! Only .jpg, .jpeg, and .png are allowed.";
+                    return View();
+                }
+
+                //VALID MINE TYPE 
+                var allowedMimeTypes = new[] { "image/jpeg", "image/png" };
+                if (!allowedMimeTypes.Contains(file.ContentType))
+                {
+                    TempData["ErrorMessage"] = "Invalid Content type! Only JPEG and PNG images are allowed.";
+                    return View();
+                }
+
+                //CHECK IF THE SIZE IS VALID
+                if (file.Length > 2 * 1024 * 1024)
+                {
+                    TempData["ErrorMessage"] = "File size exceed the maximum limit of 2 MB.";
+                    return View();
+                }
+
+                bool upload = await _studentRepository.UploadMOA(profileId,file,fileExt);
+
+                if (!upload)
+                {
+                    TempData["ErrorUploadMOA"] = "Error uploading file, Try again!";
+                    return View();
+                }
+
+                TempData["SuccessUploadMOA"] = "Succcessfully upload Memorandum of Agreement.";
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(message:$"Error: {ex.Message}");
+                return RedirectToAction("Status500","Home");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadProfilePicture(IFormFile file,int ProfileId)
+        {
+            try
+            {
+                //check if file is null or empty
+                if (file == null || file.Length == 0)
+                {
+                    TempData["ErrorMessage"] = "File is missing try, please attach a file.";
+                    return View();
+                }
+
+                //VALID EXTENSTIONS 
+                var validExt = new[] { ".jpeg", ".png", ".jpg" };
+                var fileExt = Path.GetExtension(file.FileName).ToLower();
+
+                if (!validExt.Contains(fileExt))
+                {
+                    TempData["ErrorMessage"] = "Invalid file extension.";
+                    return View();
+                }
+
+                //CHECK IF MIME TYPES IS VALID 
+                var allowedMimeTypes = new[] { "image/jpeg", "image/png" };
+                if (!allowedMimeTypes.Contains(file.ContentType))
+                {
+                    TempData["ErrorMessage"] = "Invalid file format.";
+                    return View();
+                }
+
+                //check if the file size is valid
+                if (file.Length > 2 * 1024 * 1024)
+                {
+                    TempData["ErrorMessage"] = "File exceeeded 2MB Requirements";
+                    return View();
+                }
+
+                return View();
             }
             catch (Exception ex)
             {

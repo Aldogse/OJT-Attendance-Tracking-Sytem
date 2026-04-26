@@ -14,6 +14,9 @@ namespace Attendace_Tracking_Sytem.Interface
         Task<StudentDashboardVM> GetStudentDashboardData(string UserId,int page);
         Task<MissedTimeouts> GetMissedLog(int ProfileId);
         Task<List<StudentLogVM>> PaginatedStudentLog(string UserId,int page);
+        Task<bool> UploadNBI(int ProfileId,IFormFile file,string? ext);
+        Task<bool> UploadMOA(int ProfileId,IFormFile file,string? ext);
+        Task<bool> UploadProfilePicture(IFormFile file,int ProfileId,string? ext);
        
     }
 }

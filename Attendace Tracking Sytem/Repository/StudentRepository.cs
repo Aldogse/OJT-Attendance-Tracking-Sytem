@@ -7,6 +7,7 @@ using Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS;
 using Attendace_Tracking_Sytem.Models.StudentProfiles;
 using Attendace_Tracking_Sytem.ViewModels.HR_PAGES_VM;
 using Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Attendace_Tracking_Sytem.Repository
@@ -133,6 +134,112 @@ namespace Attendace_Tracking_Sytem.Repository
                 .ToListAsync();
 
             return logs;
+        }
+
+        public async Task<bool> UploadNBI(int ProfileId, IFormFile file,string? ext)
+        {
+            var student = await  _databaseContext.StudentRequirements.FindAsync(ProfileId);
+
+            if (student == null)
+            {
+                return false;
+            }
+
+            //UPLOAD LOGIC
+
+            //DELETE OLD IMAGE IF IT EXISTS 
+            if (!string.IsNullOrEmpty(student.NbiImagePath))
+            {
+                var oldPath = Path.Combine
+                (
+                    Directory.GetCurrentDirectory(), 
+                    "wwwroot", 
+                    student.NbiImagePath.TrimStart('/')                  
+                );
+
+                //DELETE EXISTING FILE
+                if (System.IO.File.Exists(oldPath))
+                {
+                    System.IO.File.Delete(oldPath);
+                }
+            }
+
+            var NbiFilename = Guid.NewGuid().ToString() + ext;
+
+            var folderPath = Path.Combine
+                (
+                   Directory.GetCurrentDirectory(),
+                   "wwwroot","students","images"
+                );
+
+            //Create folder path if it doesn't exist
+            Directory.CreateDirectory(folderPath);
+
+            //combine the path
+            var filePath = Path.Combine(folderPath, NbiFilename);
+
+            //SAVE THE FILE ON THE SERVER 
+            using (var stream = new FileStream(filePath,FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            //SAVE THE PATH TO THE DATABASE
+            student.NbiImagePath = $"/students/images/{NbiFilename}";
+
+            await _databaseContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UploadMOA(int ProfileId, IFormFile file, string? ext)
+        {
+            var student = await _databaseContext.StudentRequirements.FindAsync(ProfileId);
+            if (student == null)
+            {
+                return false;
+            }
+
+            //UPLOAD LOGIC
+            //DELETE OLD FILE PATH
+            if (!string.IsNullOrEmpty(student.MemorandumOfAgreementImagePath))
+            {
+                var oldPath = Path.Combine(
+                 Directory.GetCurrentDirectory(),
+                  "wwwroot",
+                  student.MemorandumOfAgreementImagePath.TrimStart('/')
+                );
+
+                //DELETE THE OLD PATH
+                if(System.IO.File.Exists(oldPath))
+                {
+                    System.IO.File.Delete(oldPath);
+                }
+            }
+
+            var newMOAFilename = Guid.NewGuid().ToString() + ext;
+
+            var newMOAFilePath = Path.Combine
+                (
+                     Directory.GetCurrentDirectory(),
+                     "wwwroot",
+                     "students",
+                     "images",
+                     newMOAFilename
+                );
+
+            //CREATE FOLDER PATH IF IT DOESN'T EXIST
+            Directory.CreateDirectory(newMOAFilePath);
+
+            //save file on the server 
+            using (var stream = new FileStream(newMOAFilePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            student.MemorandumOfAgreementImagePath = $"images/students/{newMOAFilePath}";
+
+            await _databaseContext.SaveChangesAsync();
+            return true;
         }
     }
 }

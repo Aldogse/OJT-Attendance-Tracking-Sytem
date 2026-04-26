@@ -4,6 +4,7 @@ using Attendace_Tracking_Sytem.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Attendace_Tracking_Sytem.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260425192827_seed5")]
+    partial class seed5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -318,9 +321,6 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.Property<string>("MemorandumOfAgreementImagePath")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Message")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("NBI")
                         .HasColumnType("bit");
 
@@ -336,9 +336,6 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.Property<int>("StudentProfileId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Verified")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
 
                     b.HasIndex("StudentProfileId");
@@ -352,8 +349,7 @@ namespace Attendace_Tracking_Sytem.Migrations
                             MemorandumOfAgreement = false,
                             NBI = false,
                             StudentId = false,
-                            StudentProfileId = 5,
-                            Verified = false
+                            StudentProfileId = 5
                         },
                         new
                         {
@@ -361,8 +357,7 @@ namespace Attendace_Tracking_Sytem.Migrations
                             MemorandumOfAgreement = false,
                             NBI = false,
                             StudentId = false,
-                            StudentProfileId = 4,
-                            Verified = false
+                            StudentProfileId = 4
                         },
                         new
                         {
@@ -370,8 +365,7 @@ namespace Attendace_Tracking_Sytem.Migrations
                             MemorandumOfAgreement = false,
                             NBI = false,
                             StudentId = false,
-                            StudentProfileId = 3,
-                            Verified = false
+                            StudentProfileId = 3
                         });
                 });
 

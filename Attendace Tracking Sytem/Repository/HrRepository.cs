@@ -48,6 +48,12 @@ namespace Attendace_Tracking_Sytem.Repository
             _databaseContext.StudentsProfile.Entry(student)
                 .Property(i => i.Status).IsModified = true;
 
+            StudentRequirements? requirements = new StudentRequirements
+            {
+                StudentProfileId = Id,
+            };
+
+            await _databaseContext.StudentRequirements.AddAsync(requirements);
             await _databaseContext.SaveChangesAsync();
         }
 
