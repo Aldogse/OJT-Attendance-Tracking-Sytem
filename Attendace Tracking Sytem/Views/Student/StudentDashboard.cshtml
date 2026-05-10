@@ -15,23 +15,9 @@
 <body>
 
     <!-- SIDEBAR -->
-    <div class="sidebar">
-
-        <h4><i class="bi bi-mortarboard-fill"></i> OJT System</h4>
-
-        <a class="active" href="#">
-            <i class="bi bi-speedometer2"></i> Dashboard
-        </a>
-
-        <a href="#">
-            <i class="bi bi-journal-text"></i> Attendance Logs
-        </a>
-
-        <a href="#">
-            <i class="bi bi-person"></i> Profile
-        </a>
-
-    </div>
+    @{
+        Layout = "~/Views/Shared/StudentSidebarLayout.cshtml";
+    }
 
     <!-- MAIN -->
     <div class="main">

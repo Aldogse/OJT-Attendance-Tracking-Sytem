@@ -7,6 +7,7 @@ using Attendace_Tracking_Sytem.Models;
 using Attendace_Tracking_Sytem.Models.StudentProfiles;
 using Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 using Microsoft.Identity.Client;
@@ -52,8 +53,7 @@ namespace Attendace_Tracking_Sytem.Controllers
         [HttpPost]
         public async Task<IActionResult> StudentProfileForm(StudentProfileVM StudentProfile)
         {
-            try
-            {
+
                 if(!ModelState.IsValid)
                 {
                     ModelState.AddModelError("","Invalid Input! Try again");
@@ -67,36 +67,32 @@ namespace Attendace_Tracking_Sytem.Controllers
                     ModelState.AddModelError("","Student ID already exist!");
                     return View(StudentProfile);
                 }
-
-                bool email = await _databaseContext.StudentsProfile.AnyAsync(i => i.Email == StudentProfile.Email);
-
-                if(email)
-                {
-                    ModelState.AddModelError("", "Email already exist!");
-                    return View(StudentProfile);
-                }
                 var newStudent = await _registrationRepository.StudentProfileSetUp(StudentProfile);
 
                 var profile = await _databaseContext.Users.Where(i => i.Id == newStudent.UserId).FirstOrDefaultAsync();
 
-                profile.ProfileCompleted = true;
+                if (profile != null)
+                {
+                    profile.ProfileCompleted = true;
+                }
+
+                if(profile == null)
+                {
+                    ModelState.AddModelError("","Profile is null!");
+                    return View(StudentProfile);
+                }
+
                 await _databaseContext.SaveChangesAsync();
                 
                 return RedirectToAction("Success","Student");            
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message:$"Error:{ex.Message}");
-                return RedirectToAction("Status500", "Home");
-            }
+
         }
 
 
         [HttpGet]
         public async Task<IActionResult> HrPendingStudentDetails(int ProfileId)
         {
-            try
-            {
+
                 var student = await _studentRepository.PendingStudentWorkProfile(ProfileId);
 
                 var studentVM = new StudentPendingWorkProfileVM()
@@ -114,20 +110,14 @@ namespace Attendace_Tracking_Sytem.Controllers
                 };
 
                 return View(studentVM);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message:$"Error: {ex.Message}");
-                return RedirectToAction("Status500", "Home");
-            }
+
         }
 
         //TIME IN AND TIME OUT LOGIC
         [HttpPost]
         public async Task<IActionResult> TimeIn()
         {
-            try
-            {
+
                 var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 //GET USER ID THAT MATCHES THE CURRENT STUDENT    
@@ -141,19 +131,13 @@ namespace Attendace_Tracking_Sytem.Controllers
 
                 await _studentRepository.ClockIn(student.ProfileId);
                 return RedirectToAction("StudentDashboard", "Student");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message: $"Error: {ex.Message}");
-                return RedirectToAction("Status500", "Home");
-            }
+
         }
 
         [HttpPost]
         public async Task<IActionResult> TimeOut()
         {
-            try
-            {
+
                 var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 var student = await _databaseContext.StudentsProfile.AsNoTracking().Where(i => i.UserId == user)
@@ -164,20 +148,13 @@ namespace Attendace_Tracking_Sytem.Controllers
 
                 await _databaseContext.SaveChangesAsync();
                 return RedirectToAction("StudentDashboard", "Student");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message: $"Error: {ex.Message}");
-                return RedirectToAction("Status500", "Home");
-            }
         }
 
         //STUDENT DASHBOARD
         [HttpGet]
         public async Task<IActionResult> StudentDashboard(int page = 1)
         {
-            try
-            {
+
                 var UserData = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if(UserData == null)
                 {
@@ -188,19 +165,12 @@ namespace Attendace_Tracking_Sytem.Controllers
                 Student.StudentLogs = await _studentRepository.PaginatedStudentLog(UserData,Student.CurrentPage);
                 
                 return View(Student);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message:$"Error: {ex.Message}");
-                return RedirectToAction("Status500", "Home");
-            }
         }
 
         [HttpGet]
         public async Task<IActionResult> MissedTimeoutDetails(int ProfileId)
         {
-            try
-            {
+
                 var TimeoutDetails = await _databaseContext.MissedTimeouts.Include(i => i.Profile).Where(i => i.ProfileId == ProfileId)
                     .Select(i => new StudentMissedLogDetailsVM
                     {
@@ -213,19 +183,11 @@ namespace Attendace_Tracking_Sytem.Controllers
                     }).FirstOrDefaultAsync();
 
                 return View(TimeoutDetails);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message:$"Error: {ex.Message}");
-                return RedirectToAction("Status500", "Home");
-            }
         }
 
         [HttpPost]
         public async Task<IActionResult> MissedTimeoutDetails(StudentMissedLogDetailsVM exp)
         {
-            try
-            {
                 var MissedLog = await _studentRepository.GetMissedLog(exp.ProfileId);
 
                 MissedLog.Explanation = exp.Explanation;
@@ -234,171 +196,260 @@ namespace Attendace_Tracking_Sytem.Controllers
 
                 TempData["SuccessMessage"] = "Explanation submitted successfully!";
                 return RedirectToAction("StudentDashboard","Student"); ;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message: $"Error: {ex.Message}");
-                return RedirectToAction("Status500", "Home");
-            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadNBI(IFormFile file,int ProfileId)
+        public async Task<IActionResult> UploadNBI(IFormFile NBIFile, int ProfileId)
         {
-            try
-            {
+
                 //CHECK IF FILE NULL OR EMPTY
-                if (file == null || file.Length < 0)
+                if (NBIFile == null || NBIFile.Length < 0)
                 {
-                    TempData["ErrorMessage"] = "No file selected!";
-                    return View();
+                    TempData["Error"] = "No file Attached!";
+                    return RedirectToAction("StudentRequirementUploadPage","Student");
                 }
 
                 var allowedExt = new[] { ".jpg", ".jpeg", ".png" };
-                var fileExt = Path.GetExtension(file.FileName).ToLower();
+                var fileExt = Path.GetExtension(NBIFile.FileName).ToLower();
 
                 if(!allowedExt.Contains(fileExt))
                 {
-                    TempData["ErrorMessage"] = "Invalid file type! Only .jpg, .jpeg, and .png are allowed.";
-                    return View();
+                    TempData["Error"] = "Invalid file type! Only .jpg, .jpeg, and .png are allowed.";
+                    return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
                 //VALID Multipurpose Internet Mail Extensions
                 var allowedMimeTypes = new[] { "image/jpeg", "image/png" };
 
                 //CHECK IF YUNG CONTENT TYPE NG FILE AY VALID
-                if(!allowedMimeTypes.Contains(file.ContentType))
+                if(!allowedMimeTypes.Contains(NBIFile.ContentType))
                 {
-                    TempData["ErrorMessage"] = "Invalid file type! Only JPEG and PNG images are allowed.";
-                    return View();
+                    TempData["Error"]= "Invalid file type! Only JPEG and PNG images are allowed.";
+                    return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
                 //CHECK KUNG YUNG FILE SIZE AY 2 MB LANG 
-                if(file.Length > 2 * 1024 * 1024)
+                if(NBIFile.Length > 2 * 1024 * 1024)
                 {
-                    TempData["ErrorMessage"] = "File size exceed the maximum Limit.";
-                    return View();
+                   TempData["Error"] = "File size exceed the maximum Limit.";
+                   return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
-                bool uploadResult =  await _studentRepository.UploadNBI(ProfileId, file, fileExt);
+                bool uploadResult =  await _studentRepository.UploadNBI(ProfileId, NBIFile, fileExt);
 
                 if(!uploadResult)
                 {
-                    TempData["UploadError"]  = "Failed to upload NBI Clearance. Please try again.";
-                    return View();
+                    ModelState.AddModelError("","Failed to upload NBI Clearance. Please try again.");
+                    return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
-                TempData["SuccessMessage"] = "NBI Clearance uploaded successfully!";
-                return View();
+                TempData["Success"] = "NBI Clearance uploaded successfully!";
+                return RedirectToAction("StudentRequirementUploadPage", "Student");
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(message:$"Error: {ex.Message}");
-                return RedirectToAction("Status500","Home");
-            }
-        }
+        
 
         [HttpPost]
-        public async Task<IActionResult> UploadMOA(IFormFile file, int profileId)
+        public async Task<IActionResult> UploadMOA(IFormFile MOAFile, int ProfileId)
         {
-            try
-            {
+
                 //check if file ay may laman
-                if(file == null || file.Length == 0)
+                if(MOAFile == null || MOAFile.Length == 0)
                 {
-                    TempData["ErrorMessage"] = "No file selected!";
-                    return View();
+                    TempData["Error"] = "No file selected!";
+                    return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
                 //Valid format ng file 
                 var allowedExt = new[] { ".jpg", ".jpeg", ".png" };
 
                 //CHECK KUNG TAMA YUNG FILE Format
-                var fileExt = Path.GetExtension(file.FileName).ToLower();
+                var fileExt = Path.GetExtension(MOAFile.FileName).ToLower();
 
                 if (!allowedExt.Contains(fileExt))
                 {
-                    TempData["ErrorMessage"] = "Invalid file type! Only .jpg, .jpeg, and .png are allowed.";
-                    return View();
+                    TempData["Error"] = "Invalid file type! Only .jpg, .jpeg, and .png are allowed.";
+                    return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
                 //VALID MINE TYPE 
                 var allowedMimeTypes = new[] { "image/jpeg", "image/png" };
-                if (!allowedMimeTypes.Contains(file.ContentType))
+                if (!allowedMimeTypes.Contains(MOAFile.ContentType))
                 {
-                    TempData["ErrorMessage"] = "Invalid Content type! Only JPEG and PNG images are allowed.";
-                    return View();
+                    TempData["Error"] = "Invalid Content type! Only JPEG and PNG images are allowed.";
+                    return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
                 //CHECK IF THE SIZE IS VALID
-                if (file.Length > 2 * 1024 * 1024)
+                if (MOAFile.Length > 2 * 1024 * 1024)
                 {
-                    TempData["ErrorMessage"] = "File size exceed the maximum limit of 2 MB.";
-                    return View();
+                    TempData["Error"] = "File size exceed the maximum limit of 2 MB.";
+                    return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
-                bool upload = await _studentRepository.UploadMOA(profileId,file,fileExt);
+                bool upload = await _studentRepository.UploadMOA(ProfileId, MOAFile, fileExt);
 
                 if (!upload)
                 {
-                    TempData["ErrorUploadMOA"] = "Error uploading file, Try again!";
-                    return View();
+                    TempData["Error"] = "Error uploading file, Try again!";
+                    return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
-                TempData["SuccessUploadMOA"] = "Succcessfully upload Memorandum of Agreement.";
-                return View();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message:$"Error: {ex.Message}");
-                return RedirectToAction("Status500","Home");
-            }
+                TempData["Success"] = "Succcessfully upload Memorandum of Agreement.";
+                return RedirectToAction("StudentRequirementUploadPage", "Student");
+            
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadProfilePicture(IFormFile file,int ProfileId)
+        public async Task<IActionResult> UploadProfilePicture(IFormFile StudentIdFile, int ProfileId)
         {
             try
             {
-                //check if file is null or empty
-                if (file == null || file.Length == 0)
+                if(StudentIdFile == null || StudentIdFile.Length == 0)
                 {
-                    TempData["ErrorMessage"] = "File is missing try, please attach a file.";
-                    return View();
+                    TempData["Error"] = "Please attach a file";
+                    return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
-                //VALID EXTENSTIONS 
-                var validExt = new[] { ".jpeg", ".png", ".jpg" };
-                var fileExt = Path.GetExtension(file.FileName).ToLower();
+                var fileExt = Path.GetExtension(StudentIdFile.Name).ToLower();
+                //valid file extensions 
+                var validExt = new[] { ".jpg",".jpeg",".img"};
 
                 if (!validExt.Contains(fileExt))
                 {
-                    TempData["ErrorMessage"] = "Invalid file extension.";
-                    return View();
+                    TempData["Error"] = "Please attach a valid file extension!";
+                    return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
-                //CHECK IF MIME TYPES IS VALID 
+                //CHECK IF THE CONTENT IS VALID
                 var allowedMimeTypes = new[] { "image/jpeg", "image/png" };
-                if (!allowedMimeTypes.Contains(file.ContentType))
+                if (!allowedMimeTypes.Contains(StudentIdFile.ContentType))
                 {
-                    TempData["ErrorMessage"] = "Invalid file format.";
-                    return View();
+                    TempData["Error"] = "Invalid content!";
+                    return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
-                //check if the file size is valid
-                if (file.Length > 2 * 1024 * 1024)
+                //check if the size of the file is valid
+                if(StudentIdFile.Length > 2 * 1024 * 1024)
                 {
-                    TempData["ErrorMessage"] = "File exceeeded 2MB Requirements";
-                    return View();
+                    TempData["Error"] = "Allowed size is only 2MB.";
+                    return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
-                return View();
+                bool uploadImage = await _studentRepository.UploadProfilePicture(StudentIdFile, ProfileId,fileExt);
+
+                if (!uploadImage)
+                {
+                    TempData["Error"] = "Issue uploading the File, Try again!";
+                    return RedirectToAction("StudentRequirementUploadPage", "Student");
+                }
+
+                TempData["Success"] = "File successfully Uploaded!";
+                return RedirectToAction("StudentRequirementUploadPage", "Student");
+
+
             }
             catch (Exception ex)
             {
                 _logger.LogError(message: $"Error: {ex.Message}");
                 return RedirectToAction("Status500", "Home");
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> StudentRequirementUploadPage()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                TempData["Error"] = "User Id is missing!";
+                return View();
+            }
+
+            int ProfileId = await _databaseContext.StudentsProfile.Where(i => i.UserId == userId).Select(i => i.ProfileId)
+                .FirstOrDefaultAsync();
+
+            var student = await _databaseContext.StudentRequirements.FirstOrDefaultAsync(i => i.StudentProfileId == ProfileId);
+
+            var viewModel = new StudentRequirementsPageVM()
+            {
+                ProfileId = ProfileId,
+                MemorandumOfAgreementImagePath = student?.MemorandumOfAgreementImagePath,
+                NBIImagePath = student?.NbiImagePath,
+                StudentIdImagePath = student?.StudentIdImagePath,
+            };
+
+            return View(viewModel);          
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> StudentRequirements()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                TempData["Error"] = "User Id is missing!";
+                return View();
+            }
+
+            int ProfileId = await _databaseContext.StudentsProfile.Where(i => i.UserId == userId).Select(i => i.ProfileId)
+               .FirstOrDefaultAsync();
+
+            var student = await _databaseContext.StudentRequirements.FirstOrDefaultAsync(i => i.StudentProfileId == ProfileId);
+
+
+            var viewModel = new StudentRequirementStatusUpdatePageVM()
+            {
+                StudentIdImagePath = student?.StudentIdImagePath,
+                MemorandumOfAgreementImagePath = student?.MemorandumOfAgreementImagePath,
+                NBIImagePath = student?.NbiImagePath,
+                Message = student?.Message,
+                Verified = student?.Verified
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AttendanceLogs()
+        {
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            //pass the profile id on the view so that when the post happen it can be filtered
+            var profileId = await _databaseContext.StudentsProfile.Where(i => i.UserId == userId).Select(i => i.ProfileId)
+                .FirstOrDefaultAsync();
+             
+            ViewBag.ProfileId = profileId;
+
+            return View(new List<StudentLogVM>());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AttendanceLogs(DateOnly? startDate,DateOnly? endDate)
+        {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                var profileId = await _databaseContext.StudentsProfile.Where(i => i.UserId == userId)
+                    .Select(i => i.ProfileId).FirstOrDefaultAsync();
+
+                var logs = new List<StudentLogVM>();
+
+                if(startDate != null && endDate != null)
+                {
+                    logs = await _databaseContext.StudentLogs.Where
+                        (i => i.ProfileId == profileId &&
+                        i.LogDate >= startDate && i.LogDate <= endDate
+                        ).Select(i => new StudentLogVM
+                        {
+                            Logdate = i.LogDate,
+                            Timein = i.TimeIn.ToString(@"hh\:mm"),
+                            Timeout = i.TimeOut != null 
+                            ? i.TimeOut.Value.ToString(@"hh\:mm") 
+                            : "--",
+                            TotalHours = i.TotalHours,
+                        }).ToListAsync();
+                }
+
+                return View (logs);
         }
     }
 }

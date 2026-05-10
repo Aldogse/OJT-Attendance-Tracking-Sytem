@@ -1,0 +1,127 @@
+﻿@model List<Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM.StudentLogVM>
+
+@{
+    Layout = "~/Views/Shared/StudentSidebarLayout.cshtml";
+}
+
+<div class="container-fluid py-4 px-4">
+
+    <!-- HEADER -->
+    <div class="mb-4">
+        <h3 class="fw-bold mb-1">Attendance Logs</h3>
+        <small class="text-muted">Filter and view your attendance records</small>
+    </div>
+
+    <!-- FILTER -->
+    <form asp-action="AttendanceLogs" asp-controller="Student" method="post" class="mb-4">
+
+        <div class="card shadow-sm">
+            <div class="card-body d-flex flex-wrap gap-3 align-items-end">
+
+                <!-- START DATE -->
+                <div>
+                    <label class="form-label small text-muted">Start Date</label>
+                    <input type="date"
+                           name="StartDate"
+                           value="@ViewBag.StartDate"
+                           class="form-control">
+                </div>
+
+                <!-- END DATE -->
+                <div>
+                    <label class="form-label small text-muted">End Date</label>
+                    <input type="date"
+                           name="EndDate"
+                           value="@ViewBag.EndDate"
+                           class="form-control">
+                </div>
+
+                <!-- SUBMIT -->
+                <div>
+                    <button type="submit" class="btn btn-primary">
+                        Apply Filter
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+
+    <!-- TABLE -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Time In</th>
+                            <th>Time Out</th>
+                            <th>Total Hours</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var log in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @log.Logdate.ToString("MMM dd, yyyy")
+                                        <br />
+                                        <small class="text-muted">@log.Logdate.DayOfWeek</small>
+                                    </td>
+
+                                    <td class="fw-semibold">
+                                        @log.Timein
+                                    </td>
+
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(log.Timeout) && log.Timeout != "--")
+                                        {
+                                            <span class="fw-semibold">@log.Timeout</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger">Missing</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (log.TotalHours.HasValue)
+                                        {
+                                            <span class="badge bg-success-subtle text-success px-3 py-2">
+                                                @log.TotalHours hrs
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">--</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">
+                                    No attendance logs found.
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>

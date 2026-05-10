@@ -21,8 +21,6 @@ namespace Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM
         public string LastName { get; set; }
         [Required(ErrorMessage = "Age is required!")]
         public int Age { get; set; }
-        [Required(ErrorMessage = "Email is required!")]
-        public string Email { get; set; }
         [Required(ErrorMessage = "Phonenumber is required!")]
         public string PhoneNumber { get; set; }
 

@@ -43,8 +43,7 @@ namespace Attendace_Tracking_Sytem.Controllers
        [HttpPost]
        public async Task<IActionResult> HrProfileForm(HrProfileVM newProfile)
        {
-            try
-            {
+
                 if(!ModelState.IsValid)
                 {
                     ModelState.AddModelError("","Invalid Input try again!");
@@ -77,72 +76,53 @@ namespace Attendace_Tracking_Sytem.Controllers
 
                 var account = await _databaseContext.Users.Where(i => i.Id == profile.UserId).FirstOrDefaultAsync();
 
+            if (account != null)
+            {
                 account.ProfileCompleted = true;
                 await _databaseContext.SaveChangesAsync();
                 return RedirectToAction("HrDashBoard", "Hr", new { UserId = account.Id });
+            }
 
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message:$"Error: {ex.Message}");
-                return RedirectToAction("Error","Home");
-            }
+            ModelState.AddModelError("","User cannot be found!");
+            return View(newProfile);
+
+
        }
 
         [HttpGet]
         public async Task<IActionResult> HrDashBoard()
         {
-            try
-            {
+
                 var UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var ojtData = await _hrRepository.HrDashboardInformation(UserId);
 
                 return View(ojtData);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message:$"Error: {ex.Message}");
-                return RedirectToAction("Error","Home");
-            }
+
         }
 
         [HttpPost]
         public async Task<IActionResult> ApproveProfile(int Id)
         {
-            try
-            {
+
                  await _hrRepository.ApproveStudentWorkProfile(Id);
                  return RedirectToAction("HrDashboard","Hr");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message:$"Error: {ex.Message}");
-                return RedirectToAction("Error","Home");
-            }
+
         }
 
         [HttpGet]
         public async Task<IActionResult> MissedLogDetails(int ProfileId)
         {
-            try
-            {
-                
+
                 StudentMissedLogDetailsVM? studentData = await _hrRepository.MissTimeoutDetails(ProfileId);
 
                 return View(studentData);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message:$"Error:{ex.Message}");
-                return RedirectToAction("Error","Home");
-            }
+
         }
 
         [HttpPost]
         public async Task<IActionResult> ApprovedMissedLog(int ProfileId,DateOnly date)
         {
-            try
-            {
+
                 string UserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
 
                 if(UserId == null)
@@ -155,12 +135,7 @@ namespace Attendace_Tracking_Sytem.Controllers
                 TempData["ApproveSuccess"] = "Successfully modifed!";
 
                 return RedirectToAction("HrDashboard","Hr");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message: $"Error:{ex.Message}");
-                return RedirectToAction("Error", "Home");
-            }
+
         }
 
         [HttpGet]
@@ -183,23 +158,17 @@ namespace Attendace_Tracking_Sytem.Controllers
         [HttpGet]
         public async Task<IActionResult> StudentProfile(int ProfileId)
         {
-            try
-            {
+
                 var studentDetails = await _hrRepository.GetStudentProfile(ProfileId);
                 return View(studentDetails);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message: $"Error:{ex.Message}");
-                return RedirectToAction("Error", "Home");
-            }
+            
+
         }
 
         [HttpGet]
         public async Task<IActionResult> StudentLogsSummary(int ProfileId,int page = 1,DateOnly? StartDate = null,DateOnly? EndDate = null)
         {
-            try
-            {
+
                 var StudentLog = await _hrRepository.GetStudentLogSummary(ProfileId,page,StartDate,EndDate);
                 ViewBag.PageSize = 10;
                 ViewBag.CurrentPage = page;
@@ -208,12 +177,7 @@ namespace Attendace_Tracking_Sytem.Controllers
                 ViewBag.EndDate = EndDate;
 
                 return View(StudentLog);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error: {ex.Message}");
-                return RedirectToAction("Error", "Home");
-            }
+            
         }
 
     }

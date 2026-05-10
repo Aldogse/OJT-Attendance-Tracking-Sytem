@@ -1,0 +1,140 @@
+﻿@model Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM.StudentRequirementsPageVM
+
+
+
+<div class="container py-4">
+    <!-- SIDEBAR -->
+    @{
+        Layout = "~/Views/Shared/StudentSidebarLayout.cshtml";
+    }
+
+    <!-- HEADER -->
+    <div class="mb-4">
+        <h3 class="fw-bold mb-1">Requirements Upload</h3>
+        <small class="text-muted">Upload required documents for verification</small>
+    </div>
+
+    @{
+        if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["Error"]
+
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        if(TempData["Success"] != null)
+        {
+
+            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                @TempData["Success"]
+
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+    }
+    
+        <div class="row g-4">
+            <!-- NBI --> 
+             <form method="post" asp-action="UploadNBI" enctype="multipart/form-data" asp-controller="Student">
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+
+                        <h6 class="fw-bold">NBI Clearance</h6>
+
+                        <div class="mb-2">
+                            @if (Model.NBIImagePath != null)
+                            {
+                                <span class="badge bg-success">Uploaded</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Not Uploaded</span>
+                            }
+                        </div>
+
+                        <input asp-for="NBIFile" type="file" class="form-control" />
+                        <input asp-for="ProfileId" hidden />
+
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 text-end">
+                <button type="submit" class="btn btn-primary px-4">
+                    Upload N.B.I
+                </button>
+            </div>
+            </form>
+           
+            <!-- MOA -->
+        <form asp-action="UploadMOA" method="post" enctype="multipart/form-data" asp-controller="Student">
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        
+                        <h6 class="fw-bold">Memorandum of Agreement</h6>
+                        
+                        <div class="mb-2">
+                            @if (Model.MemorandumOfAgreementImagePath != null)
+                            {
+                                <span class="badge bg-success">Uploaded</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Not Uploaded</span>
+                            }
+                        </div>
+                        
+                        <input asp-for="MOAFile" type="file" class="form-control" />
+                        <input asp-for="ProfileId" hidden />
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 text-end">
+                <button type="submit" class="btn btn-primary px-4">
+                    Upload M.O.A
+                </button>
+            </div>
+            </form>
+
+            <!-- STUDENT ID -->
+        <form asp-action="UploadProfilePicture" method="post" enctype="multipart/form-data" asp-controller="Student">
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+
+                        <h6 class="fw-bold">Student ID</h6>
+
+                        <div class="mb-2">
+                            @if (Model.StudentIdImagePath != null)
+                            {
+                                <span class="badge bg-success">Uploaded</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Not Uploaded</span>
+                            }
+                        </div>
+
+                        <input asp-for="StudentIdFile" type="file" class="form-control" />
+                        <input asp-for="ProfileId" hidden />
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 text-end">
+                <button type="submit" class="btn btn-primary px-4">
+                    Upload Picture
+                </button>
+            </div>
+            </form>
+
+        </div>
+
+
+
+
+</div>

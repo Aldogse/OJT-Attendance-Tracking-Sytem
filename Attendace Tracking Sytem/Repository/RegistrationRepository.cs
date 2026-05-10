@@ -44,7 +44,6 @@ namespace Attendace_Tracking_Sytem.Repository
             {
                 StudentId = studentProfile.StudentId,
                 Age = studentProfile.Age,
-                Email = studentProfile.Email,
                 FirstName = studentProfile.Firstname,
                 LastName = studentProfile.LastName,
                 MiddleName = studentProfile.MiddleName,

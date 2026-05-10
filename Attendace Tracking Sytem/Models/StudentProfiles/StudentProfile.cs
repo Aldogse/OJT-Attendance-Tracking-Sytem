@@ -38,8 +38,6 @@ namespace Attendace_Tracking_Sytem.Models.StudentProfiles
         [Required]
         public int Age { get; set; }
 
-        [Required]
-        public string Email { get; set; } = null!;
 
         [Required]
         [StringLength(11)]

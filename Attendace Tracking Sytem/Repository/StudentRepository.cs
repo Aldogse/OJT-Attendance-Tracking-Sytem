@@ -138,11 +138,37 @@ namespace Attendace_Tracking_Sytem.Repository
 
         public async Task<bool> UploadNBI(int ProfileId, IFormFile file,string? ext)
         {
-            var student = await  _databaseContext.StudentRequirements.FindAsync(ProfileId);
+            var student = await  _databaseContext.StudentRequirements.FirstOrDefaultAsync(i => i.StudentProfileId == ProfileId);
+            var NbiFilename = Guid.NewGuid().ToString() + ext;
+
+            var folderPath = Path.Combine
+                (
+                Directory.GetCurrentDirectory(),
+                "wwwroot", "students", "images"
+                );
+
+            //combine the path
+            var filePath = Path.Combine(folderPath, NbiFilename);
 
             if (student == null)
             {
-                return false;
+                var newNbiImage = new StudentRequirements()
+                {
+                    NbiImagePath = $"/students/images/{NbiFilename}",
+                    StudentProfileId = ProfileId,                                       
+                };
+                //Create folder path if it doesn't exist
+                Directory.CreateDirectory(folderPath);
+
+                //SAVE THE FILE ON THE SERVER 
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                await _databaseContext.StudentRequirements.AddAsync(newNbiImage);
+                await _databaseContext.SaveChangesAsync();
+                return true;
             }
 
             //UPLOAD LOGIC
@@ -164,19 +190,8 @@ namespace Attendace_Tracking_Sytem.Repository
                 }
             }
 
-            var NbiFilename = Guid.NewGuid().ToString() + ext;
-
-            var folderPath = Path.Combine
-                (
-                   Directory.GetCurrentDirectory(),
-                   "wwwroot","students","images"
-                );
-
             //Create folder path if it doesn't exist
             Directory.CreateDirectory(folderPath);
-
-            //combine the path
-            var filePath = Path.Combine(folderPath, NbiFilename);
 
             //SAVE THE FILE ON THE SERVER 
             using (var stream = new FileStream(filePath,FileMode.Create))
@@ -193,10 +208,39 @@ namespace Attendace_Tracking_Sytem.Repository
 
         public async Task<bool> UploadMOA(int ProfileId, IFormFile file, string? ext)
         {
-            var student = await _databaseContext.StudentRequirements.FindAsync(ProfileId);
+            var student = await _databaseContext.StudentRequirements.FirstOrDefaultAsync(i => i.StudentProfileId == ProfileId);
+
+            var newMOAFilename = Guid.NewGuid().ToString() + ext;
+
+            var folderPath = Path.Combine
+           (
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                "students",
+                "images"
+           );
+
+            //CREATE FOLDER PATH IF IT DOESN'T EXIST
+            Directory.CreateDirectory(folderPath);
+
+            var newMOAFilePath = Path.Combine(folderPath, newMOAFilename);       
+
             if (student == null)
             {
-                return false;
+                var newMOAImage = new StudentRequirements()
+                {
+                    StudentProfileId = ProfileId,
+                    MemorandumOfAgreementImagePath = $"/students/images/{newMOAFilename}"
+                };
+
+                using (var stream = new FileStream(newMOAFilePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                await _databaseContext.StudentRequirements.AddAsync(newMOAImage);
+                await _databaseContext.SaveChangesAsync();
+                return true;
             }
 
             //UPLOAD LOGIC
@@ -205,7 +249,7 @@ namespace Attendace_Tracking_Sytem.Repository
             {
                 var oldPath = Path.Combine(
                  Directory.GetCurrentDirectory(),
-                  "wwwroot",
+                 "wwwroot",
                   student.MemorandumOfAgreementImagePath.TrimStart('/')
                 );
 
@@ -214,37 +258,63 @@ namespace Attendace_Tracking_Sytem.Repository
                 {
                     System.IO.File.Delete(oldPath);
                 }
-            }
-
-            var newMOAFilename = Guid.NewGuid().ToString() + ext;
-
-            var newMOAFilePath = Path.Combine
-                (
-                     Directory.GetCurrentDirectory(),
-                     "wwwroot",
-                     "students",
-                     "images",
-                     newMOAFilename
-                );
-
-            //CREATE FOLDER PATH IF IT DOESN'T EXIST
-            Directory.CreateDirectory(newMOAFilePath);
-
+            }      
             //save file on the server 
             using (var stream = new FileStream(newMOAFilePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }
 
-            student.MemorandumOfAgreementImagePath = $"images/students/{newMOAFilePath}";
+            student.MemorandumOfAgreementImagePath = $"/students/images/{newMOAFilename}";
 
             await _databaseContext.SaveChangesAsync();
             return true;
         }
 
-        public Task<bool> UploadProfilePicture(IFormFile file, int ProfileId, string? ext)
+        public async Task<bool> UploadProfilePicture(IFormFile file, int ProfileId, string? ext)
         {
-            throw new NotImplementedException();
+            var student = await _databaseContext.StudentRequirements.FirstOrDefaultAsync(i => i.StudentProfileId == ProfileId);
+
+            if (student == null)
+            {
+
+            }
+
+            //icheck kung may picture yung student pag meron burahin at palitan nung bagong picture
+            if (!string.IsNullOrEmpty(student.StudentIdImagePath))
+            {
+                var oldPath = Path.Combine
+                    (
+                      Directory.GetCurrentDirectory(),
+                      "wwwroot",
+                      student.StudentIdImagePath.TrimStart('/')
+                    );
+
+                if(File.Exists(oldPath))
+                    File.Delete(oldPath);
+
+            }
+
+            var newImageName = Guid.NewGuid().ToString() + ext;
+
+            var folder = Path.Combine
+                (
+                 Directory.GetCurrentDirectory(),
+                 "wwwroot",
+                 "images",
+                 "students"
+                );
+
+            var newImageFolderPath = Path.Combine(folder, newImageName);
+
+            Directory.CreateDirectory(newImageFolderPath);
+
+            using var stream = new FileStream(newImageFolderPath, FileMode.Create);
+            await file.CopyToAsync(stream);
+
+            student.StudentIdImagePath = $"/images/students/{newImageName}";
+            return true;
+            
         }
     }
 }

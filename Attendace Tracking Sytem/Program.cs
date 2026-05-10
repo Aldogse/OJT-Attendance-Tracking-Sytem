@@ -4,8 +4,10 @@ using Attendace_Tracking_Sytem.Models.Account;
 using Attendace_Tracking_Sytem.Repository;
 using Attendace_Tracking_Sytem.Seeders;
 using Attendace_Tracking_Sytem.Services;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,9 +53,29 @@ using (var scope = app.Services.CreateScope())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseExceptionHandler(error =>
+{
+    error.Run(async (context) =>
+    {
+        var exceptionFeatures = context.Features.Get<IExceptionHandlerFeature>();
+        var exception = exceptionFeatures?.Error;
+
+        Console.WriteLine($"Error: {exception?.Message}");
+
+        context.Response.StatusCode = 500;
+        context.Response.Redirect("/Home/Status500");
+    });
+});
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+app.UseCors(cors =>
+{
+    cors.AllowAnyOrigin();
+    cors.AllowAnyMethod();
+    cors.AllowAnyHeader();
+});
 
 app.MapControllerRoute(
     name: "default",

@@ -189,7 +189,6 @@ namespace Attendace_Tracking_Sytem.Repository
                   {
                     Age = student.Age,
                     Department = student.Department,
-                    Email = student.Email,
                     EndDate = student.EndDate,
                     HoursRendered = student.HoursRendered,
                     PhoneNumber = student.PhoneNumber,

@@ -37,8 +37,7 @@ namespace Attendace_Tracking_Sytem.Controllers
         [HttpPost]
         public async Task<IActionResult> StudentRegistrationForm(AccountRegistrationVM accountRegistrationVM)
         {
-            try
-            {
+
                 if(!ModelState.IsValid)
                 {
                     ModelState.AddModelError("","Invalid Input try again!");
@@ -66,12 +65,7 @@ namespace Attendace_Tracking_Sytem.Controllers
                 }
 
                 return View(accountRegistrationVM);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message:$"Error: {ex.Message}");
-                return RedirectToAction("SystemError");
-            }
+
         }
 
         //HR REGISTRATION PROCESS
@@ -84,8 +78,7 @@ namespace Attendace_Tracking_Sytem.Controllers
         [HttpPost]
         public async Task<IActionResult> HrRegistrationForm(AccountRegistrationVM accountRegistrationVM)
         {
-            try
-            {
+
                 if(!ModelState.IsValid)
                 {
                     ModelState.AddModelError("","Invalid Input!");
@@ -117,12 +110,6 @@ namespace Attendace_Tracking_Sytem.Controllers
                 }
 
                 return View(accountRegistrationVM);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message:$"Error: {ex.Message}");
-                return RedirectToAction("InvalidOperation","Home");
-            }
         }
 
         [HttpGet]
@@ -134,8 +121,7 @@ namespace Attendace_Tracking_Sytem.Controllers
         [HttpPost]
         public async Task<IActionResult> LoginPage(LoginVM loginCredentials)
         {
-            try
-            {
+
                 if(!ModelState.IsValid)
                 {
                     ModelState.AddModelError("","Invalid Input!");
@@ -191,27 +177,15 @@ namespace Attendace_Tracking_Sytem.Controllers
 
                 ModelState.AddModelError("","Invalid Email or Password");
                 return View(loginCredentials);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message:$"Error: {ex.Message}");
-                return RedirectToAction();
-            }
+
         }
 
         [HttpPost]
         public async Task<IActionResult> LogOut()
         {
-            try
-            {
+
                await _signInManager.SignOutAsync();
                return RedirectToAction("Index","Home");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message:$"Error: {ex.Message}");
-                return RedirectToAction("Error","Home");
-            }
         }
     }
 }
