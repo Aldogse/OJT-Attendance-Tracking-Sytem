@@ -302,15 +302,13 @@ namespace Attendace_Tracking_Sytem.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadProfilePicture(IFormFile StudentIdFile, int ProfileId)
         {
-            try
-            {
                 if(StudentIdFile == null || StudentIdFile.Length == 0)
                 {
                     TempData["Error"] = "Please attach a file";
                     return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
-                var fileExt = Path.GetExtension(StudentIdFile.Name).ToLower();
+                var fileExt = Path.GetExtension(StudentIdFile.FileName).ToLower();
                 //valid file extensions 
                 var validExt = new[] { ".jpg",".jpeg",".img"};
 
@@ -347,12 +345,6 @@ namespace Attendace_Tracking_Sytem.Controllers
                 return RedirectToAction("StudentRequirementUploadPage", "Student");
 
 
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message: $"Error: {ex.Message}");
-                return RedirectToAction("Status500", "Home");
-            }
         }
 
         [HttpGet]

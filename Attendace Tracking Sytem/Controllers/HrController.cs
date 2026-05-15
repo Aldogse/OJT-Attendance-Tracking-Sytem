@@ -168,7 +168,6 @@ namespace Attendace_Tracking_Sytem.Controllers
         [HttpGet]
         public async Task<IActionResult> StudentLogsSummary(int ProfileId,int page = 1,DateOnly? StartDate = null,DateOnly? EndDate = null)
         {
-
                 var StudentLog = await _hrRepository.GetStudentLogSummary(ProfileId,page,StartDate,EndDate);
                 ViewBag.PageSize = 10;
                 ViewBag.CurrentPage = page;
@@ -176,10 +175,53 @@ namespace Attendace_Tracking_Sytem.Controllers
                 ViewBag.StartDate = StartDate;
                 ViewBag.EndDate = EndDate;
 
-                return View(StudentLog);
-            
+                return View(StudentLog);            
         }
 
+        [HttpGet]
+        public async Task<IActionResult> StudentRequirements(int page = 1)
+        {
+            var students = await _hrRepository.GetStudentRequirementsVMs(page);
+            ViewBag.Pagesize = 10;
+            ViewBag.CurrentPage = page;
+
+            return View(students);
+        }
+
+        [HttpPost("{profileId:int}")]
+        public async Task<IActionResult> StudentRequirementsMessage(int profileId,string message)
+        {
+            var req = await _databaseContext.StudentRequirements.FirstOrDefaultAsync(i => i.StudentProfileId == profileId);
+
+            if(req == null)
+            {
+                TempData["Error"] = "Issue with adding the message, Profile id is missing";
+                return RedirectToAction(nameof(StudentRequirements));
+            }
+
+           req.Message = message;
+           await _databaseContext.SaveChangesAsync();
+
+            TempData["Success"] = "Message has been added!";
+            return RedirectToAction(nameof(StudentRequirements));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> VerifyStudentRequirements(int profileId)
+        {
+            var req = await _databaseContext.StudentRequirements.FirstOrDefaultAsync(i => i.StudentProfileId == profileId);
+
+            if (req == null)
+            {
+                TempData["VerifyError"] = "Issue Verifying the documents, Profile id is missing";
+                return RedirectToAction(nameof(StudentRequirements));
+            }
+
+            req.Verified = true;
+            await _databaseContext.SaveChangesAsync();
+            TempData["VerifySuccess"] = "Documents Verified!";
+            return RedirectToAction(nameof(StudentRequirements));
+        }
     }
 
 }

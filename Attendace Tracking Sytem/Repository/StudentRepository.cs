@@ -277,7 +277,7 @@ namespace Attendace_Tracking_Sytem.Repository
 
             if (student == null)
             {
-
+                return false;
             }
 
             //icheck kung may picture yung student pag meron burahin at palitan nung bagong picture
@@ -301,18 +301,19 @@ namespace Attendace_Tracking_Sytem.Repository
                 (
                  Directory.GetCurrentDirectory(),
                  "wwwroot",
-                 "images",
-                 "students"
+                 "students",
+                 "images"
                 );
 
+            Directory.CreateDirectory(folder);
             var newImageFolderPath = Path.Combine(folder, newImageName);
 
-            Directory.CreateDirectory(newImageFolderPath);
 
             using var stream = new FileStream(newImageFolderPath, FileMode.Create);
             await file.CopyToAsync(stream);
 
-            student.StudentIdImagePath = $"/images/students/{newImageName}";
+            student.StudentIdImagePath = $"/students/images/{newImageName}";
+            await _databaseContext.SaveChangesAsync();
             return true;
             
         }

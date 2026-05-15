@@ -14,9 +14,6 @@ namespace Attendace_Tracking_Sytem.Models.StudentProfiles
 
         [ValidateNever]
         public StudentProfile StudentProfile { get; set; } = null!;
-        public bool NBI { get; set; } = false;
-        public bool MemorandumOfAgreement { get; set; } = false;
-        public bool StudentId { get; set; } = false;
         public string? NbiImagePath { get; set; }
         public string? MemorandumOfAgreementImagePath { get; set; }
         public string? StudentIdImagePath { get; set; }

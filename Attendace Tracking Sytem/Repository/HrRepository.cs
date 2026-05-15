@@ -242,5 +242,30 @@ namespace Attendace_Tracking_Sytem.Repository
 
             return students ?? new StudentLogSummaryVM();
         }
+
+        public async Task<List<HrStudentRequirementsVM>> GetStudentRequirementsVMs(int page = 1)
+        {
+            int size = 5;
+            var studentRequirements = await _databaseContext.StudentRequirements.Include(i => i.StudentProfile)
+                .Where(i => i.Verified == false)
+                .Select(i => new HrStudentRequirementsVM
+                {
+                    fullName = $"{i.StudentProfile.FirstName} {i.StudentProfile.MiddleName} {i.StudentProfile.LastName}",
+                    memorandumOfAgreementImagePath = i.MemorandumOfAgreementImagePath != null ?i.MemorandumOfAgreementImagePath : "",
+                    message  = i.Message,
+                    nbiImagePath = i.NbiImagePath != null ? i.NbiImagePath : "",
+                    studentIdImagePath = i.StudentIdImagePath != null ? i.StudentIdImagePath : "",
+                    profileId = i.StudentProfileId
+                })
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            
+            return studentRequirements;
+
+            
+
+        }
     }
 }

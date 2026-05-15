@@ -17,6 +17,7 @@ namespace Attendace_Tracking_Sytem.Interface
         Task ApproveMissedLog(int ProfileId, DateOnly Logdate,string UserId);
         Task<List<StudentsMissedLogsVM>> StudentMissedLogsFiltered(MissedLogStatus? missedLogStatus,DateOnly? date);
         Task<List<StudentVM>> GetStudents(int page = 1,Departments? department = null);
+        Task<List<HrStudentRequirementsVM>> GetStudentRequirementsVMs(int page = 1);
         Task<StudentsDetailsVM> GetStudentProfile(int ProfileId);
         Task<StudentLogSummaryVM> GetStudentLogSummary(int ProfileId,int page = 1,DateOnly? StartDate = null,DateOnly? EndDate = null);
     }
