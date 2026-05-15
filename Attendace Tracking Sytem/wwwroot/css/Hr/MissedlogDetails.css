@@ -1,1 +1,33 @@
-﻿
+﻿body {
+    background: #f5f7fb;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+.card-custom {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+}
+
+.section-title {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 2px;
+}
+
+.value-text {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.status-badge {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+}
+
+.explanation-box {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 12px;
+    border: 1px solid #e9ecef;
+}
