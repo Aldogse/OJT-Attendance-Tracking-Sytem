@@ -22,7 +22,10 @@ namespace Attendace_Tracking_Sytem.Models.StudentProfiles
 
         public TimeSpan? TimeOut { get; set; } = null;
 
-        public decimal? TotalHours { get; set; }
+        
+        public TimeSpan? TotalHours { get; set; }
         public AttendanceStatus Status { get; set; } = AttendanceStatus.Incomplete;
+        public bool isAbsent { get; set; }
+        public bool isLate { get; set; }
     }
 }

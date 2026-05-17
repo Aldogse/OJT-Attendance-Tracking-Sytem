@@ -33,6 +33,13 @@ namespace Attendace_Tracking_Sytem.Controllers
         }
 
        [HttpGet]
+       public IActionResult HrProfileCreated()
+       {
+            return View();
+       }
+
+
+       [HttpGet]
        public IActionResult HrProfileForm(string UserId)
        {
             var user = new HrProfileVM();
@@ -80,7 +87,8 @@ namespace Attendace_Tracking_Sytem.Controllers
             {
                 account.ProfileCompleted = true;
                 await _databaseContext.SaveChangesAsync();
-                return RedirectToAction("HrDashBoard", "Hr", new { UserId = account.Id });
+                return RedirectToAction("Hr", "HrProfileCreated");
+                
             }
 
             ModelState.AddModelError("","User cannot be found!");

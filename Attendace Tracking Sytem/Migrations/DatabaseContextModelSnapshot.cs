@@ -212,8 +212,15 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.Property<TimeSpan?>("TimeOut")
                         .HasColumnType("time");
 
-                    b.Property<decimal?>("TotalHours")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<TimeSpan?>("TotalHours")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("time(5)");
+
+                    b.Property<bool>("isAbsent")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("isLate")
+                        .HasColumnType("bit");
 
                     b.HasKey("LogId");
 
@@ -246,8 +253,9 @@ namespace Attendace_Tracking_Sytem.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<decimal?>("HoursRendered")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<TimeSpan?>("HoursRendered")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("time(5)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -331,26 +339,6 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.HasIndex("StudentProfileId");
 
                     b.ToTable("StudentRequirements");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            StudentProfileId = 5,
-                            Verified = false
-                        },
-                        new
-                        {
-                            Id = 2,
-                            StudentProfileId = 4,
-                            Verified = false
-                        },
-                        new
-                        {
-                            Id = 3,
-                            StudentProfileId = 3,
-                            Verified = false
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

@@ -9,6 +9,7 @@ using Attendace_Tracking_Sytem.ViewModels.HR_PAGES_VM;
 using Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace Attendace_Tracking_Sytem.Repository
 {
@@ -37,27 +38,28 @@ namespace Attendace_Tracking_Sytem.Repository
         }
 
         //CLOCK IN AND CLOCK OUT FUNCTIONS
-        public async Task<StudentLogs> ClockIn(int? ProfileId)
+        public async Task<StudentLogs> ClockIn(int? ProfileId,TimeOnly shiftStart)
         {
-            try
-            {
-                var logs = new StudentLogs()
-                {
-                    ProfileId = ProfileId,
-                    LogDate = DateOnly.FromDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day)),
-                    TimeIn = DateTime.Now.TimeOfDay,
-                    TimeOut = null
-                };
+            TimeSpan currentTime = DateTime.Now.TimeOfDay;
+            TimeOnly clockInTime = new TimeOnly(currentTime.Hours,currentTime.Minutes,currentTime.Seconds);
 
-                await _databaseContext.StudentLogs.AddAsync(logs);
-                await _databaseContext.SaveChangesAsync();
-                return logs;
-            }
-            catch (Exception ex)
+            var logs = new StudentLogs()
             {
-                _logger.LogError($"Error: {ex.Message}");
-                return new StudentLogs();
-            }
+                ProfileId = ProfileId,
+                LogDate = DateOnly.FromDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day)),
+                TimeIn = currentTime,
+                TimeOut = null,
+                isAbsent = false,
+            };
+
+            if(clockInTime > shiftStart)
+            {
+                logs.isLate = true;
+            }   
+
+            await _databaseContext.StudentLogs.AddAsync(logs);
+            await _databaseContext.SaveChangesAsync();
+            return logs;
         }
 
         public async Task<StudentLogs> ClockOut(int? ProfileId)
@@ -66,10 +68,11 @@ namespace Attendace_Tracking_Sytem.Repository
             var studentData = await _databaseContext.StudentLogs.Where(i => i.ProfileId == ProfileId && i.LogDate == date)
                 .FirstOrDefaultAsync();
 
+
             studentData.TimeOut = DateTime.Now.TimeOfDay;
             studentData.Status = Enums.AttendanceStatus.Complete;
 
-            studentData.TotalHours = (decimal)(studentData.TimeOut - studentData.TimeIn)?.TotalHours;
+            studentData.TotalHours = studentData.TimeOut - studentData.TimeIn ;
 
             return studentData;
         }

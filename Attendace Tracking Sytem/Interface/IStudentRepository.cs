@@ -9,7 +9,7 @@ namespace Attendace_Tracking_Sytem.Interface
     public interface IStudentRepository
     {
         Task<StudentProfile> PendingStudentWorkProfile(int Id);
-        Task<StudentLogs> ClockIn(int? Id);
+        Task<StudentLogs> ClockIn(int? Id,TimeOnly shiftStart);
         Task<StudentLogs> ClockOut(int? Id);
         Task<StudentDashboardVM> GetStudentDashboardData(string UserId,int page);
         Task<MissedTimeouts> GetMissedLog(int ProfileId);

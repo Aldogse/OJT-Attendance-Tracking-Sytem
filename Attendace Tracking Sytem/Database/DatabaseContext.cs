@@ -48,24 +48,15 @@ namespace Attendace_Tracking_Sytem.Database
                 .Property(i => i.Status)
                 .HasConversion<string>();
 
+            builder.Entity<StudentLogs>()
+                .Property(i => i.TotalHours)
+                .HasPrecision(5, 2);
 
-            builder.Entity<StudentRequirements>()
-                .HasData(new StudentRequirements
-                {
-                    Id = 1,
-                   StudentProfileId = 5,
+            builder.Entity<StudentProfile>()
+                .Property(i => i.HoursRendered)
+                .HasPrecision(5, 2);
 
-                }, new StudentRequirements
-                {
-                    Id = 2,
-                    StudentProfileId = 4,
-                },
-                new StudentRequirements
-                {
-                    Id = 3,
-                    StudentProfileId = 3,
-                }
-                );
+
 
 
             //builder.Entity<StudentLogs>().HasData(

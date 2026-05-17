@@ -120,16 +120,16 @@ namespace Attendace_Tracking_Sytem.Controllers
 
                 var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                //GET USER ID THAT MATCHES THE CURRENT STUDENT    
-                var student = await _databaseContext.StudentsProfile.AsNoTracking().Where(i => i.UserId == user)
-                    .FirstOrDefaultAsync();
+            //GET USER ID THAT MATCHES THE CURRENT STUDENT    
+             var student = await _databaseContext.StudentsProfile.FirstOrDefaultAsync(i => i.UserId == user);
 
                 if(student == null)
                 {
-                    return RedirectToAction("Error","Home");
+                TempData["TimeInError"] = "Error during Time in.";
+                return RedirectToAction(nameof(StudentDashboard));
                 }
 
-                await _studentRepository.ClockIn(student.ProfileId);
+                await _studentRepository.ClockIn(student.ProfileId,student.ShiftStart);
                 return RedirectToAction("StudentDashboard", "Student");
 
         }

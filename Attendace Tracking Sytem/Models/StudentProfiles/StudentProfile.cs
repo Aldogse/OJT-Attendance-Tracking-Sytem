@@ -53,7 +53,7 @@ namespace Attendace_Tracking_Sytem.Models.StudentProfiles
         [Required]
         public DateOnly EndDate { get; set; }
 
-        public decimal? HoursRendered { get; set; }
+        public TimeSpan? HoursRendered { get; set; }
         public decimal RequiredHours { get; set; } = 300;
         public TimeOnly ShiftStart { get; set; } = new TimeOnly(8, 0);
         public TimeOnly ShiftEnd { get; set; } = new TimeOnly(17, 0);

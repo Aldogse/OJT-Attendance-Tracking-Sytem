@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Attendace_Tracking_Sytem.Migrations
 {
     /// <inheritdoc />
-    public partial class initialmigrationforsomee : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,6 +33,7 @@ namespace Attendace_Tracking_Sytem.Migrations
                     DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastLogin = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    ProfileCompleted = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -196,12 +197,11 @@ namespace Attendace_Tracking_Sytem.Migrations
                     MiddleName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Age = table.Column<int>(type: "int", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
                     Department = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     StartDate = table.Column<DateOnly>(type: "date", nullable: false),
                     EndDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    HoursRendered = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    HoursRendered = table.Column<TimeSpan>(type: "time(5)", precision: 5, scale: 2, nullable: true),
                     RequiredHours = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     ShiftStart = table.Column<TimeOnly>(type: "time", nullable: false),
                     ShiftEnd = table.Column<TimeOnly>(type: "time", nullable: false),
@@ -228,11 +228,20 @@ namespace Attendace_Tracking_Sytem.Migrations
                     LogId = table.Column<int>(type: "int", nullable: false),
                     ProfileId = table.Column<int>(type: "int", nullable: true),
                     LogDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    Missed = table.Column<bool>(type: "bit", nullable: false)
+                    Explanation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Timeout = table.Column<TimeSpan>(type: "time", nullable: true),
+                    status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ApproverProfileId = table.Column<int>(type: "int", nullable: true),
+                    HrProfileProfileId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MissedTimeouts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MissedTimeouts_HRProfile_HrProfileProfileId",
+                        column: x => x.HrProfileProfileId,
+                        principalTable: "HRProfile",
+                        principalColumn: "ProfileId");
                     table.ForeignKey(
                         name: "FK_MissedTimeouts_StudentsProfile_ProfileId",
                         column: x => x.ProfileId,
@@ -248,10 +257,12 @@ namespace Attendace_Tracking_Sytem.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProfileId = table.Column<int>(type: "int", nullable: true),
                     LogDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    TimeIn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TimeOut = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    TotalHours = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false)
+                    TimeIn = table.Column<TimeSpan>(type: "time", nullable: false),
+                    TimeOut = table.Column<TimeSpan>(type: "time", nullable: true),
+                    TotalHours = table.Column<TimeSpan>(type: "time(5)", precision: 5, scale: 2, nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    isAbsent = table.Column<bool>(type: "bit", nullable: false),
+                    isLate = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -259,6 +270,30 @@ namespace Attendace_Tracking_Sytem.Migrations
                     table.ForeignKey(
                         name: "FK_StudentLogs_StudentsProfile_ProfileId",
                         column: x => x.ProfileId,
+                        principalTable: "StudentsProfile",
+                        principalColumn: "ProfileId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudentRequirements",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StudentProfileId = table.Column<int>(type: "int", nullable: false),
+                    NbiImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MemorandumOfAgreementImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StudentIdImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Verified = table.Column<bool>(type: "bit", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudentRequirements", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StudentRequirements_StudentsProfile_StudentProfileId",
+                        column: x => x.StudentProfileId,
                         principalTable: "StudentsProfile",
                         principalColumn: "ProfileId",
                         onDelete: ReferentialAction.Cascade);
@@ -309,6 +344,11 @@ namespace Attendace_Tracking_Sytem.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MissedTimeouts_HrProfileProfileId",
+                table: "MissedTimeouts",
+                column: "HrProfileProfileId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MissedTimeouts_ProfileId",
                 table: "MissedTimeouts",
                 column: "ProfileId");
@@ -317,6 +357,11 @@ namespace Attendace_Tracking_Sytem.Migrations
                 name: "IX_StudentLogs_ProfileId",
                 table: "StudentLogs",
                 column: "ProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentRequirements_StudentProfileId",
+                table: "StudentRequirements",
+                column: "StudentProfileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentsProfile_UserId",
@@ -343,16 +388,19 @@ namespace Attendace_Tracking_Sytem.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "HRProfile");
-
-            migrationBuilder.DropTable(
                 name: "MissedTimeouts");
 
             migrationBuilder.DropTable(
                 name: "StudentLogs");
 
             migrationBuilder.DropTable(
+                name: "StudentRequirements");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "HRProfile");
 
             migrationBuilder.DropTable(
                 name: "StudentsProfile");

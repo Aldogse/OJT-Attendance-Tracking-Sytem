@@ -26,7 +26,7 @@ namespace Attendace_Tracking_Sytem.Repository
             int HrProfileId = await _databaseContext.HRProfile.Where(i => i.UserId == UserId).Select(i => i.ProfileId).FirstOrDefaultAsync();
 
             studentLogs.TimeOut = log.Timeout;
-            studentLogs.TotalHours = (decimal)(studentLogs.TimeOut - studentLogs.TimeIn)?.TotalHours;
+            studentLogs.TotalHours = studentLogs.TimeOut - studentLogs.TimeIn;
             studentLogs.Status = Enums.AttendanceStatus.Complete;
             studentLogs.StudentProfile.HoursRendered = studentLogs.TotalHours;
             log.status = Enums.MissedLogStatus.Approved;

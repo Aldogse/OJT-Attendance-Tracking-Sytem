@@ -8,6 +8,6 @@ namespace Attendace_Tracking_Sytem.ViewModels.HR_PAGES_VM
         public string Fullname { get; set; }
         public string StudentId { get; set; }
         public Departments Department { get; set; }
-        public decimal? HoursRendered { get; set; }
+        public TimeSpan? HoursRendered { get; set; }
     }
 }
