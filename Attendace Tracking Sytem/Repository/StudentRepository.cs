@@ -320,5 +320,12 @@ namespace Attendace_Tracking_Sytem.Repository
             return true;
             
         }
+
+        //
+        public async Task<List<int>> GetProfileIds()
+        {
+            var ids = await _databaseContext.StudentsProfile.Select(i => i.ProfileId).ToListAsync();
+            return ids;
+        }
     }
 }

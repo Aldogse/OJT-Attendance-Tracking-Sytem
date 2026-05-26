@@ -29,18 +29,15 @@ builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 
 //BACKGROUND SERVICES
 //builder.Services.AddHostedService<LogCheckBackgroundService>();
+//builder.Services.AddHostedService<AttendanceCheckerService>();
 
 var app = builder.Build();
-
-
 
 using (var scope = app.Services.CreateScope())
 {
     var roles = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-    await RoleSeeder.SeedRoleAsync(roles);
+    await RoleSeeder.seedRolesAsync(roles);
 }
-
 
     // Configure the HTTP request pipeline.
     if (!app.Environment.IsDevelopment())

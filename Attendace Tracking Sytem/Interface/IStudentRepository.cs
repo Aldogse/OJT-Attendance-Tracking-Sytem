@@ -17,6 +17,7 @@ namespace Attendace_Tracking_Sytem.Interface
         Task<bool> UploadNBI(int ProfileId,IFormFile file,string? ext);
         Task<bool> UploadMOA(int ProfileId,IFormFile file,string? ext);
         Task<bool> UploadProfilePicture(IFormFile file,int ProfileId,string? ext);
+        Task<List<int>> GetProfileIds();
        
     }
 }

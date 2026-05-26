@@ -5,13 +5,13 @@ namespace Attendace_Tracking_Sytem.Seeders
 {
     public class RoleSeeder
     {
-        public static async Task SeedRoleAsync(RoleManager<IdentityRole>roleManager)
+        public static async Task seedRolesAsync(RoleManager<IdentityRole>roles)
         {
-            foreach (var role in Enum.GetNames(typeof(Roles)))
+            foreach (var role in Enum.GetValues<Roles>())
             {
-                if(!await roleManager.RoleExistsAsync(role))
+                if(!await roles.RoleExistsAsync(role.ToString()))
                 {
-                    await roleManager.CreateAsync(new IdentityRole(role));
+                    await roles.CreateAsync(new IdentityRole(role.ToString()));
                 }
             }
         }

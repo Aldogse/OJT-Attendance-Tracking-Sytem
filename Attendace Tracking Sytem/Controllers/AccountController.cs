@@ -180,6 +180,44 @@ namespace Attendace_Tracking_Sytem.Controllers
 
         }
 
+        [HttpGet]
+        public IActionResult AdminRegistrationForm()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AdminRegistrationForm(AccountRegistrationVM accountRegistrationVM)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            //check if the email used to register exist
+            var email = await _userManager.FindByEmailAsync(accountRegistrationVM.Email);
+
+            //throw error message na may nagamit na yun email
+            if(email != null)
+            {
+                ModelState.AddModelError("","Email already exist");
+                return View(accountRegistrationVM);
+            }
+
+            //Create ng user profile
+            var newUser = new LogInCredentials
+            {
+                Email = accountRegistrationVM.Email,
+                UserName = accountRegistrationVM.Email
+            };
+
+            var user = await _userManager.CreateAsync(newUser,accountRegistrationVM.Password);
+
+            if (user.Succeeded)
+            {
+                var role = await _userManager.AddToRoleAsync(newUser,Roles.Admin.ToString());
+                return RedirectToAction("AdminProfileForm","Admin",new {UserId = newUser.Id});
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> LogOut()
         {
