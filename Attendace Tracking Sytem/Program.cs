@@ -1,3 +1,4 @@
+using Attendace_Tracking_Sytem.ApiSettings;
 using Attendace_Tracking_Sytem.Database;
 using Attendace_Tracking_Sytem.Interface;
 using Attendace_Tracking_Sytem.Models.Account;
@@ -26,6 +27,12 @@ builder.Services.AddIdentity<LogInCredentials,IdentityRole>()
 builder.Services.AddScoped<IRegistrationRepository,RegistrationRepository>();
 builder.Services.AddScoped<IHrRepository, HrRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<EmailServices>();
+
+//SET UP EMAIL SERRVICE
+builder.Services.Configure<BrevoSettings>(
+  builder.Configuration.GetSection("BrevoSettings")    
+);
 
 //BACKGROUND SERVICES
 //builder.Services.AddHostedService<LogCheckBackgroundService>();

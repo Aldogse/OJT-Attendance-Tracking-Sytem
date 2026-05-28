@@ -1,17 +1,20 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNetCoreGeneratedDocument;
+using Attendace_Tracking_Sytem.ApiSettings;
 using Attendace_Tracking_Sytem.Database;
 using Attendace_Tracking_Sytem.Enums;
 using Attendace_Tracking_Sytem.Interface;
 using Attendace_Tracking_Sytem.Models.Account;
 using Attendace_Tracking_Sytem.Models.HR_Profiles;
 using Attendace_Tracking_Sytem.Models.StudentProfiles;
+using Attendace_Tracking_Sytem.Services;
 using Attendace_Tracking_Sytem.ViewModels.HR_PAGES_VM;
 using Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Attendace_Tracking_Sytem.Controllers
 {
@@ -21,15 +24,18 @@ namespace Attendace_Tracking_Sytem.Controllers
         private readonly DatabaseContext _databaseContext;
         private readonly ILogger<HrController> _logger;
         private readonly IHrRepository _hrRepository;
+        private readonly EmailServices _emailServices;
 
         public HrController(IRegistrationRepository registrationRepository,DatabaseContext databaseContext
             ,ILogger<HrController>logger,
-            IHrRepository hrRepository)
+            IHrRepository hrRepository,
+            EmailServices emailServices)
         {
             _registrationRepository = registrationRepository;
             _databaseContext = databaseContext;
             _logger = logger;
             _hrRepository = hrRepository;
+            _emailServices = emailServices;
         }
 
        [HttpGet]
@@ -111,10 +117,25 @@ namespace Attendace_Tracking_Sytem.Controllers
         [HttpPost]
         public async Task<IActionResult> ApproveProfile(int Id)
         {
+            var userId = await _databaseContext.StudentsProfile.Where(i => i.ProfileId == Id)
+                .Select(i => i.UserId).FirstOrDefaultAsync();
 
-                 await _hrRepository.ApproveStudentWorkProfile(Id);
-                 return RedirectToAction("HrDashboard","Hr");
+            var userEmail = await _databaseContext.Users.Where(i => i.Id == userId)
+                .Select(i => i.Email).FirstOrDefaultAsync();
 
+            if(userEmail == null)
+            {
+                ModelState.AddModelError("","Email cannot be found");
+                return View();
+            }
+
+            await _hrRepository.ApproveStudentWorkProfile(Id);
+
+             _emailServices.sendEmailAsync(userEmail,"Approval Message",
+                "<h1>Hi your profile has bee successfully approved<h1>");
+
+
+            return RedirectToAction("HrDashboard","Hr");
         }
 
         [HttpGet]

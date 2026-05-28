@@ -11,7 +11,8 @@ namespace Attendace_Tracking_Sytem.Services
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ILogger<AttendanceCheckerService> _logger;
 
-        public AttendanceCheckerService(IServiceScopeFactory serviceScopeFactory,ILogger<AttendanceCheckerService>logger)
+        public AttendanceCheckerService(IServiceScopeFactory serviceScopeFactory,
+            ILogger<AttendanceCheckerService>logger)
         {
             _serviceScopeFactory = serviceScopeFactory;
             _logger = logger;
@@ -98,7 +99,7 @@ namespace Attendace_Tracking_Sytem.Services
                         TotalHours = TimeSpan.Zero,
                         Status = Enums.AttendanceStatus.Complete,                      
                     };
-
+                   
                     //i store sa list na ginawa
                     defaultLogs.Add(logs);
                 }

@@ -216,6 +216,8 @@ namespace Attendace_Tracking_Sytem.Controllers
                 var role = await _userManager.AddToRoleAsync(newUser,Roles.Admin.ToString());
                 return RedirectToAction("AdminProfileForm","Admin",new {UserId = newUser.Id});
             }
+
+            return View();
         }
 
         [HttpPost]
