@@ -40,13 +40,13 @@ namespace Attendace_Tracking_Sytem.Repository
         //CLOCK IN AND CLOCK OUT FUNCTIONS
         public async Task<StudentLogs> ClockIn(int? ProfileId,TimeOnly shiftStart)
         {
-            TimeSpan currentTime = DateTime.Now.TimeOfDay;
+            TimeSpan currentTime = DateTime.UtcNow.TimeOfDay;
             TimeOnly clockInTime = new TimeOnly(currentTime.Hours,currentTime.Minutes,currentTime.Seconds);
 
             var logs = new StudentLogs()
             {
                 ProfileId = ProfileId,
-                LogDate = DateOnly.FromDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day)),
+                LogDate = DateOnly.FromDateTime(new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day)),
                 TimeIn = currentTime,
                 TimeOut = null,
                 isAbsent = false,
@@ -64,12 +64,12 @@ namespace Attendace_Tracking_Sytem.Repository
 
         public async Task<StudentLogs> ClockOut(int? ProfileId)
         {
-            DateOnly date = DateOnly.FromDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day));
+            DateOnly date = DateOnly.FromDateTime(new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day));
             var studentData = await _databaseContext.StudentLogs.Where(i => i.ProfileId == ProfileId && i.LogDate == date)
                 .FirstOrDefaultAsync();
 
 
-            studentData.TimeOut = DateTime.Now.TimeOfDay;
+            studentData.TimeOut = DateTime.UtcNow.TimeOfDay;
             studentData.Status = Enums.AttendanceStatus.Complete;
 
             studentData.TotalHours = studentData.TimeOut - studentData.TimeIn ;
@@ -81,7 +81,7 @@ namespace Attendace_Tracking_Sytem.Repository
         public async Task<StudentDashboardVM> GetStudentDashboardData(string UserId,int page)
         {
             int size = 1;
-            DateTime date = DateTime.Now;
+            DateTime date = DateTime.UtcNow;
             StudentDashboardVM? student = await _databaseContext.StudentsProfile.Where(i => i.UserId == UserId)
                 .Select(i => new StudentDashboardVM
                 {
@@ -115,7 +115,7 @@ namespace Attendace_Tracking_Sytem.Repository
 
         public async Task<List<StudentLogVM>> PaginatedStudentLog(string UserId, int page)
         {
-           DateTime date = DateTime.Now;
+           DateTime date = DateTime.UtcNow;
             int size = 5;
 
             int ProfileId = await _databaseContext.StudentsProfile.Where(i => i.UserId == UserId).Select(i => i.ProfileId).FirstOrDefaultAsync();

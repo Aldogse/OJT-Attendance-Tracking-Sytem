@@ -107,10 +107,16 @@ namespace Attendace_Tracking_Sytem.Controllers
         public async Task<IActionResult> HrDashBoard()
         {
 
-                var UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var ojtData = await _hrRepository.HrDashboardInformation(UserId);
+            var UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                return View(ojtData);
+            if (UserId == null)
+            {
+                return RedirectToAction("Status500","Home");
+            }
+
+            var ojtData = await _hrRepository.HrDashboardInformation(UserId);
+
+            return View(ojtData);
 
         }
 
@@ -120,7 +126,7 @@ namespace Attendace_Tracking_Sytem.Controllers
             var userId = await _databaseContext.StudentsProfile.Where(i => i.ProfileId == Id)
                 .Select(i => i.UserId).FirstOrDefaultAsync();
 
-            var userEmail = await _databaseContext.Users.Where(i => i.Id == userId)
+            var userEmail = await _databaseContext.Users.AsNoTracking().Where(i => i.Id == userId)
                 .Select(i => i.Email).FirstOrDefaultAsync();
 
             if(userEmail == null)
@@ -152,14 +158,26 @@ namespace Attendace_Tracking_Sytem.Controllers
         public async Task<IActionResult> ApprovedMissedLog(int ProfileId,DateOnly date)
         {
 
-                string UserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+            string UserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
 
-                if(UserId == null)
-                {
-                    ModelState.AddModelError("","Payload Missing");
-                    return View();
-                }
-                await _hrRepository.ApproveMissedLog(ProfileId,date,UserId);
+            if(UserId == null)
+            {
+                ModelState.AddModelError("","Payload Missing");
+                return View();
+            }
+
+            var email = await _databaseContext.Users.AsNoTracking().Where(i => i.Id == UserId)
+            .Select(i => i.Email).FirstOrDefaultAsync();
+
+            if (email == null)
+            {
+                ModelState.AddModelError("", "Email not found");
+                return View();
+            }
+            await _hrRepository.ApproveMissedLog(ProfileId,date,UserId);
+
+             _emailServices.sendEmailAsync(email,"Missed Log Approval",
+                "<h1>Missed log has been approved<h1>");
 
                 TempData["ApproveSuccess"] = "Successfully modifed!";
 
@@ -245,6 +263,18 @@ namespace Attendace_Tracking_Sytem.Controllers
                 TempData["VerifyError"] = "Issue Verifying the documents, Profile id is missing";
                 return RedirectToAction(nameof(StudentRequirements));
             }
+
+            var user = await _databaseContext.StudentsProfile.Where(i => i.ProfileId == profileId).Select(i => i.UserId).FirstOrDefaultAsync();
+
+            var email = await _databaseContext.Users.Where(i => i.Id == user).AsNoTracking().Select(i => i.Email).FirstOrDefaultAsync();
+
+            if(email == null)
+            {
+                ModelState.AddModelError("","No email attached on the account!");
+                return View();
+            }
+            _emailServices.sendEmailAsync(email,"Verified Documents","<h1>Documents has been approved!<h1>");
+
 
             req.Verified = true;
             await _databaseContext.SaveChangesAsync();
