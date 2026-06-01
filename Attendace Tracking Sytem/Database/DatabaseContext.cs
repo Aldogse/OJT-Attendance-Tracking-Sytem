@@ -19,6 +19,7 @@ namespace Attendace_Tracking_Sytem.Database
         public DbSet<StudentLogs> StudentLogs { get; set; }
         public DbSet<MissedTimeouts> MissedTimeouts { get; set; }
         public DbSet<StudentRequirements> StudentRequirements { get; set; }
+        public DbSet<DailyAttendanceReport> DailyAttendanceReports { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

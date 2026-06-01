@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AspNetCoreGeneratedDocument;
 using Attendace_Tracking_Sytem.Database;
 using Attendace_Tracking_Sytem.Interface;
+using Attendace_Tracking_Sytem.Models.HR_Profiles;
 using Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS;
 using Attendace_Tracking_Sytem.Models.StudentProfiles;
 using Attendace_Tracking_Sytem.ViewModels.HR_PAGES_VM;
@@ -62,19 +63,26 @@ namespace Attendace_Tracking_Sytem.Repository
             return logs;
         }
 
-        public async Task<StudentLogs> ClockOut(int? ProfileId)
+        public async Task<bool> ClockOut(int? ProfileId)
         {
             DateOnly date = DateOnly.FromDateTime(new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day));
-            var studentData = await _databaseContext.StudentLogs.Where(i => i.ProfileId == ProfileId && i.LogDate == date)
-                .FirstOrDefaultAsync();
 
+            //i checheck kung nakapag clock in na si user
+            var studentData = await _databaseContext.StudentLogs.FirstOrDefaultAsync(i => i.ProfileId == ProfileId && i.LogDate == date);
+                
+            if(studentData == null)
+            {
+                return false;
+            }
 
             studentData.TimeOut = DateTime.UtcNow.TimeOfDay;
             studentData.Status = Enums.AttendanceStatus.Complete;
 
-            studentData.TotalHours = studentData.TimeOut - studentData.TimeIn ;
+            studentData.TotalHours = studentData.TimeOut - studentData.TimeIn;
 
-            return studentData;
+            await _databaseContext.SaveChangesAsync();
+
+            return true;
         }
 
         //DASHBOARD DATA QUERIES
@@ -326,6 +334,28 @@ namespace Attendace_Tracking_Sytem.Repository
         {
             var ids = await _databaseContext.StudentsProfile.Select(i => i.ProfileId).ToListAsync();
             return ids;
+        }
+
+
+        public async Task<DailyAttendanceReport> GetDailyAttendanceReport(DateOnly logDate)
+        {
+            var attendance = await _databaseContext.StudentLogs.Where(i => i.LogDate == logDate)
+               .ToListAsync();
+
+            int absents = await _databaseContext.StudentLogs.Where(i => i.isAbsent == true).CountAsync();
+            int present = await _databaseContext.StudentLogs.Where(i => i.isAbsent == false).CountAsync();
+            int lates = await _databaseContext.StudentLogs.Where(i => i.isLate == true).CountAsync();
+
+            var attendanceReport = new DailyAttendanceReport
+            {
+                attendanceDate = new DateTime(logDate.Year,logDate.Month,logDate.Day),
+                numberOfAbsents = absents,
+                numberOfLates = lates,
+                numberOfPresent = present
+            };
+
+            return attendanceReport;
+
         }
     }
 }

@@ -10,6 +10,7 @@ namespace Attendace_Tracking_Sytem.Services
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ILogger<AttendanceCheckerService> _logger;
+        private int errCount;
 
         public AttendanceCheckerService(IServiceScopeFactory serviceScopeFactory,
             ILogger<AttendanceCheckerService>logger)
@@ -55,59 +56,72 @@ namespace Attendace_Tracking_Sytem.Services
                         var database = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
                         var repository = scope.ServiceProvider.GetRequiredService<IStudentRepository>();
                         await AttendanceChecker(database, repository);
-                    }                
+                        errCount = 0;
+                    }
+
+                    errCount = 0;
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Error: {ex.Message}");
-                    await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
+                    errCount++;
+                    _logger.LogError(message: $"Error: {ex.Message}");
+                    await Task.Delay(TimeSpan.FromMinutes(3), stoppingToken);
+
+                    if (errCount >= 5)
+                    {
+                        using var scope = _serviceScopeFactory.CreateScope();
+                        var emailService = scope.ServiceProvider.GetRequiredService<EmailServices>();
+                        emailService.sendEmailAsync("ezekiellamoste4@gmail.com", "Failing Service",
+                        $"<h1>Attendance Checker Service hit maximum retries but failed to execute! Error Message:{ex.Message} <h1>");
+                    }
                 }
             }
         }
 
         //LOGIC
+        //TAGGING NG ABSENT SA DATABASE
         private async Task AttendanceChecker(DatabaseContext databaseContext,IStudentRepository studentRepository)
         {
-            //kunin ang date today
-            DateOnly date = DateOnly.FromDateTime(new DateTime(DateTime.Now.Year,DateTime.Now.Month,DateTime.Now.Day));
 
-            //GET ALL PROFILE ID FROM STUDENT PROFILE 
-            var profileIds = await studentRepository.GetProfileIds();
+                //kunin ang date today
+                DateOnly date = DateOnly.FromDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day));
 
-            //KUNIN LAHAT NG PROFILE ID SA STUDENT LOGS 
-            var studentLogProfileId = await databaseContext.StudentLogs.Where(i => i.LogDate == date)
-                .Select(i => i.ProfileId)
-                .ToHashSetAsync();
-                
+                //GET ALL PROFILE ID FROM STUDENT PROFILE 
+                var profileIds = await studentRepository.GetProfileIds();
 
-            //DITO IISTORE AND MGA MISSED LOGS PARA I DEFAULT 
-            List<StudentLogs> defaultLogs = [];
+                //KUNIN LAHAT NG PROFILE ID SA STUDENT LOGS 
+                var studentLogProfileId = await databaseContext.StudentLogs.Where(i => i.LogDate == date)
+                    .Select(i => i.ProfileId)
+                    .ToHashSetAsync();
 
-            //Iterate ka sa profile id para icheck ano profile id and hindi nag punch in para ma set sa default after 5pm
-            foreach(var id in profileIds)
-            {
-                if (!studentLogProfileId.Contains(id))
+
+                //DITO IISTORE AND MGA MISSED LOGS PARA I DEFAULT 
+                List<StudentLogs> defaultLogs = [];
+
+                //Iterate ka sa profile id para icheck ano profile id and hindi nag punch in para ma set sa default after 5pm
+                foreach (var id in profileIds)
                 {
-                    //create ng default log 
-                    var logs = new StudentLogs
+                    if (!studentLogProfileId.Contains(id))
                     {
-                        isAbsent = true,
-                        LogDate = date,
-                        ProfileId = id,
-                        TimeIn = TimeSpan.Zero,
-                        TimeOut = TimeSpan.Zero,
-                        TotalHours = TimeSpan.Zero,
-                        Status = Enums.AttendanceStatus.Complete,                      
-                    };
-                   
-                    //i store sa list na ginawa
-                    defaultLogs.Add(logs);
-                }
-            }
+                        //create ng default log 
+                        var logs = new StudentLogs
+                        {
+                            isAbsent = true,
+                            LogDate = date,
+                            ProfileId = id,
+                            TimeIn = TimeSpan.Zero,
+                            TimeOut = TimeSpan.Zero,
+                            TotalHours = TimeSpan.Zero,
+                            Status = Enums.AttendanceStatus.Complete,
+                        };
 
-            //i add ng isang bagsakan sa database 
-            await databaseContext.StudentLogs.AddRangeAsync(defaultLogs);
-            await databaseContext.SaveChangesAsync();
+                        //i store sa list na ginawa
+                        defaultLogs.Add(logs);
+                    }
+                }
+                //i add ng isang bagsakan sa database 
+                await databaseContext.StudentLogs.AddRangeAsync(defaultLogs);
+                await databaseContext.SaveChangesAsync();
         }
     }
 }

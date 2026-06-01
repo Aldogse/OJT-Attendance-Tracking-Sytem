@@ -19,7 +19,7 @@ namespace Attendace_Tracking_Sytem.Controllers
 
         public AccountController(UserManager<LogInCredentials> userManager,
             SignInManager<LogInCredentials> signInManager,
-            ILogger<AccountController>logger,
+            ILogger<AccountController> logger,
             DatabaseContext databaseContext)
         {
             _userManager = userManager;
@@ -38,33 +38,39 @@ namespace Attendace_Tracking_Sytem.Controllers
         public async Task<IActionResult> StudentRegistrationForm(AccountRegistrationVM accountRegistrationVM)
         {
 
-                if(!ModelState.IsValid)
-                {
-                    ModelState.AddModelError("","Invalid Input try again!");
-                    return View(accountRegistrationVM);
-                }
-
-                var newUser = new LogInCredentials()
-                {
-                    Email = accountRegistrationVM.Email,
-                    UserName = accountRegistrationVM.Email
-                };
-
-                var newUserCredentials = await _userManager.CreateAsync(newUser,accountRegistrationVM.Password);
-
-                if (newUserCredentials.Succeeded)
-                {
-
-                    var role = await _userManager.AddToRoleAsync(newUser,Enums.Roles.Student.ToString());
-                    return RedirectToAction("StudentProfileForm", "Student",new { UserId = newUser.Id});
-                }
-
-                foreach (var error in newUserCredentials.Errors)
-                {
-                    ModelState.AddModelError("",error.Description);
-                }
-
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", "Invalid Input try again!");
                 return View(accountRegistrationVM);
+            }
+
+            if (!accountRegistrationVM.Email.Contains('@'))
+            {
+                ModelState.AddModelError("", "Email is not valid");
+                return View(accountRegistrationVM);
+            }
+
+            var newUser = new LogInCredentials()
+            {
+                Email = accountRegistrationVM.Email,
+                UserName = accountRegistrationVM.Email
+            };
+
+            var newUserCredentials = await _userManager.CreateAsync(newUser, accountRegistrationVM.Password);
+
+            if (newUserCredentials.Succeeded)
+            {
+
+                var role = await _userManager.AddToRoleAsync(newUser, Enums.Roles.Student.ToString());
+                return RedirectToAction("StudentProfileForm", "Student", new { UserId = newUser.Id });
+            }
+
+            foreach (var error in newUserCredentials.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+
+            return View(accountRegistrationVM);
 
         }
 
@@ -79,37 +85,43 @@ namespace Attendace_Tracking_Sytem.Controllers
         public async Task<IActionResult> HrRegistrationForm(AccountRegistrationVM accountRegistrationVM)
         {
 
-                if(!ModelState.IsValid)
-                {
-                    ModelState.AddModelError("","Invalid Input!");
-                    return View(accountRegistrationVM);
-                }
-
-                var newUser = new LogInCredentials()
-                {
-                    UserName = accountRegistrationVM?.Email,
-                    Email = accountRegistrationVM?.Email,
-                };
-
-                var newUserCredentials = await _userManager.CreateAsync(newUser,accountRegistrationVM.Password);
-
-                if (newUserCredentials.Succeeded)
-                {
-                    var role = await _userManager.AddToRoleAsync(newUser,Roles.HR.ToString());
-                    return RedirectToAction("HrProfileForm","Hr",new {UserId = newUser.Id});
-                }
-
-                if (!newUser.ProfileCompleted)
-                {
-                    return RedirectToAction("HrProfileForm", "Hr",new {UserId = newUser.Id});
-                }
-
-                foreach (var err in newUserCredentials.Errors)
-                {
-                    ModelState.AddModelError("", err.Description);
-                }
-
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", "Invalid Input!");
                 return View(accountRegistrationVM);
+            }
+
+            if (!accountRegistrationVM.Email.Contains('@'))
+            {
+                ModelState.AddModelError("", "Please enter a valid email");
+                return View(accountRegistrationVM);
+            }
+
+            var newUser = new LogInCredentials()
+            {
+                UserName = accountRegistrationVM?.Email,
+                Email = accountRegistrationVM?.Email,
+            };
+
+            var newUserCredentials = await _userManager.CreateAsync(user: newUser, password: accountRegistrationVM.Password);
+
+            if (newUserCredentials.Succeeded)
+            {
+                var role = await _userManager.AddToRoleAsync(newUser, Roles.HR.ToString());
+                return RedirectToAction("HrProfileForm", "Hr", new { UserId = newUser.Id });
+            }
+
+            if (!newUser.ProfileCompleted)
+            {
+                return RedirectToAction("HrProfileForm", "Hr", new { UserId = newUser.Id });
+            }
+
+            foreach (var err in newUserCredentials.Errors)
+            {
+                ModelState.AddModelError("", err.Description);
+            }
+
+            return View(accountRegistrationVM);
         }
 
         [HttpGet]
@@ -122,61 +134,61 @@ namespace Attendace_Tracking_Sytem.Controllers
         public async Task<IActionResult> LoginPage(LoginVM loginCredentials)
         {
 
-                if(!ModelState.IsValid)
-                {
-                    ModelState.AddModelError("","Invalid Input!");
-                    return View(loginCredentials);
-                }
-
-                var user = await _userManager.FindByEmailAsync(loginCredentials.EmailAddress);
-                
-                if(user == null)
-                {
-                    ModelState.AddModelError("","Profile not found!");
-                    return View(loginCredentials);
-                }
-
-                if (!user.ProfileCompleted)
-                {
-                    var hr = await _databaseContext.HRProfile.FirstOrDefaultAsync(i => i.UserId == user.Id);
-
-                    if (hr != null)
-                    {
-                        return RedirectToAction("HrProfileForm", "Hr", new { UserId = user.Id });
-                    }
-
-                    return RedirectToAction("StudentProfileForm","Student",new {UserId = user.Id});
-                }
-
-                var result = await _signInManager.PasswordSignInAsync(user.Email!, loginCredentials.Password,false,false);
-
-                if (result.Succeeded)
-                {
-                    if (await _userManager.IsInRoleAsync(user, "Student"))
-                    {
-                        //check if the profile has been approved, if not route success page
-                        var profile = await _databaseContext.StudentsProfile.Where(i => i.UserId == user.Id)
-                            .Select(i => i.Status).FirstOrDefaultAsync();
-
-                        if (profile.Equals(Status.Pending))
-                        {
-                            return RedirectToAction("Success","Student");
-                        }
-
-                        return RedirectToAction("StudentDashboard", "Student",new {UserId = user.Id});
-                    }
-                    else if (await _userManager.IsInRoleAsync(user, "HR"))
-                    {
-                        return RedirectToAction("HrDashboard", "Hr",new {UserId = user.Id});
-                    }
-                    else if (await _userManager.IsInRoleAsync(user, "Supervisor"))
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
-                }
-
-                ModelState.AddModelError("","Invalid Email or Password");
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", "Invalid Input!");
                 return View(loginCredentials);
+            }
+
+            var user = await _userManager.FindByEmailAsync(loginCredentials.EmailAddress);
+
+            if (user == null)
+            {
+                ModelState.AddModelError("", "Profile not found!");
+                return View(loginCredentials);
+            }
+
+            if (!user.ProfileCompleted)
+            {
+                var hr = await _databaseContext.HRProfile.FirstOrDefaultAsync(i => i.UserId == user.Id);
+
+                if (hr != null)
+                {
+                    return RedirectToAction("HrProfileForm", "Hr", new { UserId = user.Id });
+                }
+
+                return RedirectToAction("StudentProfileForm", "Student", new { UserId = user.Id });
+            }
+
+            var result = await _signInManager.PasswordSignInAsync(user.Email!, loginCredentials.Password, false, false);
+
+            if (result.Succeeded)
+            {
+                if (await _userManager.IsInRoleAsync(user, "Student"))
+                {
+                    //check if the profile has been approved, if not route success page
+                    var profile = await _databaseContext.StudentsProfile.Where(i => i.UserId == user.Id)
+                        .Select(i => i.Status).FirstOrDefaultAsync();
+
+                    if (profile.Equals(Status.Pending))
+                    {
+                        return RedirectToAction("Success", "Student");
+                    }
+
+                    return RedirectToAction("StudentDashboard", "Student", new { UserId = user.Id });
+                }
+                else if (await _userManager.IsInRoleAsync(user, "HR"))
+                {
+                    return RedirectToAction("HrDashboard", "Hr", new { UserId = user.Id });
+                }
+                else if (await _userManager.IsInRoleAsync(user, "Supervisor"))
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+
+            ModelState.AddModelError("", "Invalid Email or Password");
+            return View(loginCredentials);
 
         }
 
@@ -196,9 +208,9 @@ namespace Attendace_Tracking_Sytem.Controllers
             var email = await _userManager.FindByEmailAsync(accountRegistrationVM.Email);
 
             //throw error message na may nagamit na yun email
-            if(email != null)
+            if (email != null)
             {
-                ModelState.AddModelError("","Email already exist");
+                ModelState.AddModelError("", "Email already exist");
                 return View(accountRegistrationVM);
             }
 
@@ -209,12 +221,12 @@ namespace Attendace_Tracking_Sytem.Controllers
                 UserName = accountRegistrationVM.Email
             };
 
-            var user = await _userManager.CreateAsync(newUser,accountRegistrationVM.Password);
+            var user = await _userManager.CreateAsync(newUser, accountRegistrationVM.Password);
 
             if (user.Succeeded)
             {
-                var role = await _userManager.AddToRoleAsync(newUser,Roles.Admin.ToString());
-                return RedirectToAction("AdminProfileForm","Admin",new {UserId = newUser.Id});
+                var role = await _userManager.AddToRoleAsync(newUser, Roles.Admin.ToString());
+                return RedirectToAction("AdminProfileForm", "Admin", new { UserId = newUser.Id });
             }
 
             return View();
@@ -224,8 +236,8 @@ namespace Attendace_Tracking_Sytem.Controllers
         public async Task<IActionResult> LogOut()
         {
 
-               await _signInManager.SignOutAsync();
-               return RedirectToAction("Index","Home");
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
         }
     }
 }

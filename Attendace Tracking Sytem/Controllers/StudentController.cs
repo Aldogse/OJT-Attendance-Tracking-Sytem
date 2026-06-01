@@ -138,16 +138,26 @@ namespace Attendace_Tracking_Sytem.Controllers
         public async Task<IActionResult> TimeOut()
         {
 
-                var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                var student = await _databaseContext.StudentsProfile.AsNoTracking().Where(i => i.UserId == user)
-                    .FirstOrDefaultAsync();
+            var student = await _databaseContext.StudentsProfile.AsNoTracking().Where(i => i.UserId == user)
+                .FirstOrDefaultAsync();
 
+            if(student == null)
+            {
+                ModelState.AddModelError("","User id is missing");
+                return RedirectToAction(nameof(StudentDashboard));
+            }
 
-                await _studentRepository.ClockOut(student.ProfileId);
+            bool isClockOut = await _studentRepository.ClockOut(student.ProfileId);
 
-                await _databaseContext.SaveChangesAsync();
-                return RedirectToAction("StudentDashboard", "Student");
+            if (!isClockOut)
+            {
+                ModelState.AddModelError("","No Clock in recorded, Please clock in.");
+                return RedirectToAction(nameof(StudentDashboard));
+            }
+
+            return RedirectToAction("StudentDashboard", "Student");
         }
 
         //STUDENT DASHBOARD
@@ -442,6 +452,12 @@ namespace Attendace_Tracking_Sytem.Controllers
                 }
 
                 return View (logs);
+        }
+
+        [HttpGet]
+        public IActionResult StudentDailyAttendanceReport()
+        {
+            return View();
         }
     }
 }

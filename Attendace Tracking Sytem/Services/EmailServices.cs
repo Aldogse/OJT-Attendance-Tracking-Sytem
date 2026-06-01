@@ -12,7 +12,7 @@ namespace Attendace_Tracking_Sytem.Services
     {
         private BrevoSettings _settings;
 
-        public EmailServices(IOptions<BrevoSettings>options)
+        public EmailServices(IOptions<BrevoSettings> options)
         {
             _settings = options.Value;
         }
@@ -22,7 +22,7 @@ namespace Attendace_Tracking_Sytem.Services
             //SET yung api key para sa brevo
             Configuration.Default.ApiKey["api-key"] = _settings.apiKey;
 
-           //INTIATE EMAILS API
+            //INTIATE EMAILS API
             var apiInstance = new TransactionalEmailsApi();
 
             //SET UP SENDER 

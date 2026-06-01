@@ -3,6 +3,7 @@ using System;
 using Attendace_Tracking_Sytem.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Attendace_Tracking_Sytem.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260531074328_added new table for daily attendance track")]
+    partial class addednewtablefordailyattendancetrack
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,9 +113,6 @@ namespace Attendace_Tracking_Sytem.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int?>("numberOfLates")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("numberOfPresent")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");

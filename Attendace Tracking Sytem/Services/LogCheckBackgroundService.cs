@@ -4,6 +4,7 @@ using Attendace_Tracking_Sytem.Interface;
 using Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS;
 using Attendace_Tracking_Sytem.Repository;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Attendace_Tracking_Sytem.Services
 {
@@ -11,6 +12,7 @@ namespace Attendace_Tracking_Sytem.Services
     {
         private readonly ILogger<LogCheckBackgroundService> _logger;
         private readonly IServiceScopeFactory _serviceScope;
+        private int errCount;
 
         public LogCheckBackgroundService(ILogger<LogCheckBackgroundService>logger,
             IServiceScopeFactory serviceScope)
@@ -32,20 +34,28 @@ namespace Attendace_Tracking_Sytem.Services
 
                     var delay = nextDay - now;
                     await LogBackgroundService(repository, database);
+                    errCount = 0;
                     await Task.Delay(delay, stoppingToken);
                 }
                 catch (Exception ex)
                 {
+                    errCount++;
                     _logger.LogError(message: $"Error: {ex.Message}");
-                    await Task.Delay(TimeSpan.FromHours(2), stoppingToken);
+                    await Task.Delay(TimeSpan.FromMinutes(3), stoppingToken);
+
+                    if (errCount >= 5)
+                    {
+                        using var scope = _serviceScope.CreateScope();
+                        var emailService = scope.ServiceProvider.GetRequiredService<EmailServices>();
+                        emailService.sendEmailAsync("ezekiellamoste4@gmail.com", "Failing Service",
+                        $"<h1>Attendance Checker Service hit maximum retries but failed to execute! Error Message:{ex.Message} <h1>");
+                    }
                 }
             }
         }
 
         private async Task LogBackgroundService(IHrRepository hrRepository,DatabaseContext database)
         {
-            try
-            {
                 //this should have .adddays + 1
                 DateOnly date = DateOnly.FromDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day));
 
@@ -66,12 +76,7 @@ namespace Attendace_Tracking_Sytem.Services
 
                 await database.MissedTimeouts.AddRangeAsync(MissingLogs);
                 await database.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(message: $"Error: {ex.Message}");
-                return;
-            }
+            
         }
     }
 }
