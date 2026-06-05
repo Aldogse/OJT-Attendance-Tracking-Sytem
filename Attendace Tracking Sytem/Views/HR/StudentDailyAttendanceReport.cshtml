@@ -1,0 +1,112 @@
+﻿@model Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM.DailyAttendanceReportVM
+
+@{
+    Layout = "~/Views/Shared/HrSidebarLayout.cshtml";
+
+    bool hasReport =
+        Model != null &&
+        (
+            Model.numberOfAbsents != null ||
+            Model.numberOfLates != null ||
+            Model.numberOfPresent != null
+        );
+}
+
+<div class="container mt-5">
+
+    <div class="card shadow-sm">
+
+        <div class="card-header">
+            <h3 class="mb-0">Attendance Report</h3>
+        </div>
+
+        <div class="card-body">
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    <div asp-validation-summary="All"></div>
+                </div>
+            }
+
+            <form method="get"
+                  asp-action="StudentDailyAttendanceReport"
+                  asp-controller="Hr">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-4">
+                        <label class="form-label">Start Date</label>
+                        <input type="date"
+                               name="start"
+                               value="@Model?.start"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">End Date</label>
+                        <input type="date"
+                               name="end"
+                               value="@Model?.end"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+                            Filter Report
+                        </button>
+                    </div>
+
+                </div>
+
+            </form>
+
+            <hr class="my-4">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-striped">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Absents</th>
+                            <th>Lates</th>
+                            <th>Present</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @if (hasReport)
+                        {
+                            <tr>
+                                <td>@Model.start</td>
+                                <td>@Model.end</td>
+                                <td>@Model.numberOfAbsents</td>
+                                <td>@Model.numberOfLates</td>
+                                <td>@Model.numberOfPresent</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    No report data available.
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

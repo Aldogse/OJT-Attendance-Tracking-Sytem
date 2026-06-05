@@ -1,6 +1,8 @@
 ﻿using Attendace_Tracking_Sytem.Database;
 using Attendace_Tracking_Sytem.Enums;
+using Attendace_Tracking_Sytem.Helpers;
 using Attendace_Tracking_Sytem.Interface;
+using Attendace_Tracking_Sytem.Models.HR_Profiles;
 using Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS;
 using Attendace_Tracking_Sytem.Models.StudentProfiles;
 using Attendace_Tracking_Sytem.ViewModels.HR_DASHBOARD_VM;
@@ -75,12 +77,29 @@ namespace Attendace_Tracking_Sytem.Repository
 
             var NumOfFinishingStudents = await _databaseContext.StudentsProfile.Where(i => i.EndDate.Month == date.Month).CountAsync();
 
+            var totalAbsents = await _databaseContext.DailyAttendanceReports.Where(i => i.attendanceDate.Month == date.Month)
+                .Select(i => i.numberOfAbsents).CountAsync();
+
+            var totalLates = await _databaseContext.DailyAttendanceReports.Where(i => i.attendanceDate.Month == date.Month)
+               .Select(i => i.numberOfLates).CountAsync();
+
+            int weekDays = WeekDaysCounter.WeeekDayCounter(date);
+
+            var absentRate = (double) (totalAbsents / weekDays) * 100;
+            var lateRate = (double) (totalLates / weekDays) * 100;
+            List<DailyAttendanceReport> attendanceTrend = await _databaseContext.DailyAttendanceReports
+                .Where(i => i.attendanceDate.Month == date.Month && i.attendanceDate.Year == date.Year).ToListAsync();
+
             return new HrDashBoardVM
             {
                 NumberOfActiveStudents = numberOfActiveStudents,
                 FinishingStudents = NumOfFinishingStudents,
                 PendingStudents = pendingStatus,
                 FullName = $"{UserData.FirstName} {UserData.MiddleName} {UserData.LastName}",
+                monthLateRate = absentRate,
+                monthAbsentism = totalAbsents,
+                attendanceTrend = attendanceTrend,
+               
             };
         }
 
@@ -262,10 +281,24 @@ namespace Attendace_Tracking_Sytem.Repository
                 .ToListAsync();
 
             
-            return studentRequirements;
+            return studentRequirements;         
+        }
 
-            
+        public async Task<DailyAttendanceReportVM> DailyAttendanceReport(DateOnly? start, DateOnly? end)
+        {
+            var attendanceResults = await _databaseContext.DailyAttendanceReports.Where(i => i.attendanceDate >= start
+            && i.attendanceDate >= end).ToListAsync();
 
+            var results = new DailyAttendanceReportVM
+            {
+                start = start != null ? start.ToString() : "",
+                end = end != null ? end.ToString() : "",
+                numberOfAbsents = attendanceResults.Sum(i => i.numberOfAbsents),
+                numberOfLates = attendanceResults.Sum(i => i.numberOfLates),
+                numberOfPresent = attendanceResults.Sum(i => i.numberOfPresent)
+            };
+
+            return results;
         }
     }
 }

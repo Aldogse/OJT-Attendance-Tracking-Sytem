@@ -48,7 +48,7 @@ namespace Attendace_Tracking_Sytem.Services
                         using var scope = _serviceScope.CreateScope();
                         var emailService = scope.ServiceProvider.GetRequiredService<EmailServices>();
                         emailService.sendEmailAsync("ezekiellamoste4@gmail.com", "Failing Service",
-                        $"<h1>Attendance Checker Service hit maximum retries but failed to execute! Error Message:{ex.Message} <h1>");
+                        $"<h1>Log Check Background Service hit maximum retries but failed to execute! Error Message:{ex.Message} <h1>");
                     }
                 }
             }

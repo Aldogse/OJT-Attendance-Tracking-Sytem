@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using AspNetCoreGeneratedDocument;
 using Attendace_Tracking_Sytem.Database;
 using Attendace_Tracking_Sytem.Interface;
@@ -337,6 +338,7 @@ namespace Attendace_Tracking_Sytem.Repository
         }
 
 
+        //BACK GROUND SERVICE FUNCTIONS
         public async Task<DailyAttendanceReport> GetDailyAttendanceReport(DateOnly logDate)
         {
             var attendance = await _databaseContext.StudentLogs.Where(i => i.LogDate == logDate)
@@ -348,7 +350,7 @@ namespace Attendace_Tracking_Sytem.Repository
 
             var attendanceReport = new DailyAttendanceReport
             {
-                attendanceDate = new DateTime(logDate.Year,logDate.Month,logDate.Day),
+                attendanceDate = logDate,
                 numberOfAbsents = absents,
                 numberOfLates = lates,
                 numberOfPresent = present

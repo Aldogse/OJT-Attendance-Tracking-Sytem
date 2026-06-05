@@ -20,6 +20,7 @@ namespace Attendace_Tracking_Sytem.Interface
         Task<bool> UploadProfilePicture(IFormFile file,int ProfileId,string? ext);
         Task<List<int>> GetProfileIds();
         Task<DailyAttendanceReport> GetDailyAttendanceReport(DateOnly logDate);
+
        
     }
 }

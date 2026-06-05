@@ -8,6 +8,7 @@ using Attendace_Tracking_Sytem.Interface;
 using Attendace_Tracking_Sytem.Models.Account;
 using Attendace_Tracking_Sytem.Models.HR_Profiles;
 using Attendace_Tracking_Sytem.Models.StudentProfiles;
+using Attendace_Tracking_Sytem.Repository;
 using Attendace_Tracking_Sytem.Services;
 using Attendace_Tracking_Sytem.ViewModels.HR_PAGES_VM;
 using Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM;
@@ -280,6 +281,31 @@ namespace Attendace_Tracking_Sytem.Controllers
             await _databaseContext.SaveChangesAsync();
             TempData["VerifySuccess"] = "Documents Verified!";
             return RedirectToAction(nameof(StudentRequirements));
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> StudentDailyAttendanceReport([FromQuery]DateOnly? start, [FromQuery]DateOnly? end)
+        {
+            if (start > end)
+            {
+                ModelState.AddModelError("", "Start date cannot be greater than end date");
+                return View();
+            }
+
+            if (start != null && end != null)
+            {
+                var results = await _hrRepository.DailyAttendanceReport(start, end);
+
+                if (results == null)
+                {
+                    ModelState.AddModelError("", "No Report showing for selected dates");
+                    return View();
+                }
+
+                return View(results);
+            }
+            return View();
         }
     }
 

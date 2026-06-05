@@ -454,10 +454,5 @@ namespace Attendace_Tracking_Sytem.Controllers
                 return View (logs);
         }
 
-        [HttpGet]
-        public IActionResult StudentDailyAttendanceReport()
-        {
-            return View();
-        }
     }
 }

@@ -9,6 +9,6 @@ namespace Attendace_Tracking_Sytem.Models.HR_Profiles
         public int? numberOfAbsents { get; set; }
         public int? numberOfLates { get; set; }
         public int? numberOfPresent {  get; set; }
-        public DateTime attendanceDate { get; set; }
+        public DateOnly attendanceDate { get; set; }
     }
 }

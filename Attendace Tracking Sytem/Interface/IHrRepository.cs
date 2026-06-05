@@ -20,5 +20,7 @@ namespace Attendace_Tracking_Sytem.Interface
         Task<List<HrStudentRequirementsVM>> GetStudentRequirementsVMs(int page = 1);
         Task<StudentsDetailsVM> GetStudentProfile(int ProfileId);
         Task<StudentLogSummaryVM> GetStudentLogSummary(int ProfileId,int page = 1,DateOnly? StartDate = null,DateOnly? EndDate = null);
+        //DATE RANGE
+        Task<DailyAttendanceReportVM> DailyAttendanceReport(DateOnly? start, DateOnly? end);
     }
 }
