@@ -39,6 +39,7 @@ builder.Services.Configure<BrevoSettings>(
 //BACKGROUND SERVICES
 //builder.Services.AddHostedService<LogCheckBackgroundService>();
 //builder.Services.AddHostedService<AttendanceCheckerService>();
+//builder.Services.AddHostedService<AttendanceStatusCheckerService>();
 
 var app = builder.Build();
 

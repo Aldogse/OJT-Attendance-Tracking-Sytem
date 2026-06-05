@@ -45,8 +45,6 @@ namespace Attendace_Tracking_Sytem.Services
                 {
 
                     errCount++;
-                    _logger.LogError(message: $"Error: {ex.Message}");
-                    await Task.Delay(TimeSpan.FromMinutes(3), stoppingToken);
 
                     if (errCount >= 5)
                     {
@@ -55,6 +53,9 @@ namespace Attendace_Tracking_Sytem.Services
                         emailService.sendEmailAsync("ezekiellamoste4@gmail.com", "Failing Service",
                         $"<h1>Attendance Status Checker Service hit maximum retries but failed to execute! Error Message:{ex.Message} <h1>");
                     }
+                    _logger.LogError(message: $"Error: {ex.Message}");
+                    await Task.Delay(TimeSpan.FromMinutes(3), stoppingToken);
+
                 }
             }
         }

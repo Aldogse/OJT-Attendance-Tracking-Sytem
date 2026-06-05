@@ -105,7 +105,7 @@ namespace Attendace_Tracking_Sytem.Controllers
        }
 
         [HttpGet]
-        public async Task<IActionResult> HrDashBoard()
+        public async Task<IActionResult> HrDashBoard([FromQuery]DateOnly? startDate,[FromQuery]DateOnly? endDate)
         {
 
             var UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -115,7 +115,7 @@ namespace Attendace_Tracking_Sytem.Controllers
                 return RedirectToAction("Status500","Home");
             }
 
-            var ojtData = await _hrRepository.HrDashboardInformation(UserId);
+            var ojtData = await _hrRepository.HrDashboardInformation(UserId,startDate,endDate);
 
             return View(ojtData);
 

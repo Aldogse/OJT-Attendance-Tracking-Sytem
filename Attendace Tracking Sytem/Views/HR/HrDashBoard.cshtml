@@ -38,50 +38,6 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card dashboard-card p-4">
-                    <div class="stat-title">Finishing Students</div>
-                    <h3 class="fw-bold">@Model.FinishingStudents</h3>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- ANALYTICS -->
-        <div class="row g-4 mb-4">
-
-            <div class="col-md-6">
-                <div class="card dashboard-card p-4">
-                    <div class="stat-title">
-                        Monthly Absenteeism Rate
-                    </div>
-
-                    <h3 class="fw-bold text-danger">
-                        @(Model.monthAbsentism?.ToString("0.00") ?? "0.00")%
-                    </h3>
-
-                    <small class="text-muted">
-                        Percentage of absences this month
-                    </small>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="card dashboard-card p-4">
-                    <div class="stat-title">
-                        Monthly Late Rate
-                    </div>
-
-                    <h3 class="fw-bold text-warning">
-                        @(Model.monthLateRate?.ToString("0.00") ?? "0.00")%
-                    </h3>
-
-                    <small class="text-muted">
-                        Percentage of late arrivals this month
-                    </small>
-                </div>
-            </div>
-
         </div>
 
         <!-- ATTENDANCE TREND -->
@@ -89,50 +45,57 @@
 
             <div class="card-body">
 
-                <h5 class="fw-bold mb-3">
-                    Attendance Trend
-                </h5>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">
+                        Attendance Trend
+                    </h5>
+                </div>
+
+                <!-- FILTER -->
+                <form method="get"
+                      asp-action="HrDashBoard"
+                      asp-controller="HR"
+                      class="mb-4">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+                            <label class="form-label">
+                                Start Date
+                            </label>
+
+                            <input type="date"
+                                   name="startDate"
+                                   class="form-control" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">
+                                End Date
+                            </label>
+
+                            <input type="date"
+                                   name="endDate"
+                                   class="form-control" />
+                        </div>
+
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit"
+                                    class="btn btn-primary w-100">
+                                Apply Filter
+                            </button>
+                        </div>
+
+                    </div>
+
+                </form>
 
                 @if (Model.attendanceTrend != null &&
                                 Model.attendanceTrend.Any())
                 {
-                    <table class="table table-striped table-hover">
-
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Present</th>
-                                <th>Lates</th>
-                                <th>Absents</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            @foreach (var report in Model.attendanceTrend)
-                            {
-                                <tr>
-                                    <td>
-                                        @report.attendanceDate.ToString("MMM dd, yyyy")
-                                    </td>
-
-                                    <td>
-                                        @report.numberOfPresent
-                                    </td>
-
-                                    <td>
-                                        @report.numberOfLates
-                                    </td>
-
-                                    <td>
-                                        @report.numberOfAbsents
-                                    </td>
-                                </tr>
-                            }
-
-                        </tbody>
-
-                    </table>
+                    <canvas id="attendanceTrendChart"
+                            height="100">
+                    </canvas>
                 }
                 else
                 {
@@ -194,6 +157,75 @@
         </div>
 
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    @if (Model.attendanceTrend != null &&
+        Model.attendanceTrend.Any())
+    {
+        <script>
+
+            const labels = [
+                @Html.Raw(string.Join(",",
+                    Model.attendanceTrend.Select(
+                            x => $"'{x.attendanceDate:MMM dd}'")))
+        ];
+
+        const presentData = [
+            @Html.Raw(string.Join(",",
+                                Model.attendanceTrend.Select(
+                                        x => x.numberOfPresent ?? 0)))
+        ];
+
+        const lateData = [
+            @Html.Raw(string.Join(",",
+                                Model.attendanceTrend.Select(
+                                        x => x.numberOfLates ?? 0)))
+        ];
+
+        const absentData = [
+            @Html.Raw(string.Join(",",
+                                Model.attendanceTrend.Select(
+                                        x => x.numberOfAbsents ?? 0)))
+        ];
+
+        new Chart(
+            document.getElementById('attendanceTrendChart'),
+            {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Present',
+                            data: presentData,
+                            borderColor: '#198754',
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Late',
+                            data: lateData,
+                            borderColor: '#ffc107',
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Absent',
+                            data: absentData,
+                            borderColor: '#dc3545',
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+    </script>
+        }
 
 </body>
 </html>

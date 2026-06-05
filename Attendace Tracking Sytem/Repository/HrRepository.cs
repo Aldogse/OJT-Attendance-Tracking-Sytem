@@ -64,7 +64,7 @@ namespace Attendace_Tracking_Sytem.Repository
             throw new NotImplementedException();
         }
 
-        public async Task<HrDashBoardVM> HrDashboardInformation(string UserId)
+        public async Task<HrDashBoardVM> HrDashboardInformation(string UserId,DateOnly? startDate,DateOnly? endDate)
         {
             DateTime date = DateTime.Now;
             var UserData = await _databaseContext.HRProfile.Where(i => i.UserId == UserId).FirstOrDefaultAsync();
@@ -75,32 +75,41 @@ namespace Attendace_Tracking_Sytem.Repository
             var numberOfActiveStudents = await _databaseContext.StudentsProfile.Where(i => i.Status == Enums.Status.Active)
                 .CountAsync();
 
-            var NumOfFinishingStudents = await _databaseContext.StudentsProfile.Where(i => i.EndDate.Month == date.Month).CountAsync();
+            var totalAbsents = startDate == null && endDate == null
+            //DEFAULT VALUE
+            ? await _databaseContext.DailyAttendanceReports.Where(i => i.attendanceDate.Month == date.Month && i.attendanceDate.Year == date.Year)
+                .SumAsync(i => i.numberOfLates ?? 0)
+            //FILTERED VALUE
+            : await _databaseContext.DailyAttendanceReports.Where(i => i.attendanceDate >= startDate && i.attendanceDate <= endDate)
+            .SumAsync(i => i.numberOfLates ?? 0);
+            
 
-            var totalAbsents = await _databaseContext.DailyAttendanceReports.Where(i => i.attendanceDate.Month == date.Month)
-                .Select(i => i.numberOfAbsents).CountAsync();
+            var totalLates = startDate == null && endDate == null 
+            ?  await _databaseContext.DailyAttendanceReports.Where(i => i.attendanceDate.Month == date.Month && i.attendanceDate.Year == date.Year)
+            .SumAsync(i => i.numberOfLates ?? 0)
+            //FILTERED VALUES
+            : await _databaseContext.DailyAttendanceReports.Where(i => i.attendanceDate >= startDate && i.attendanceDate <= endDate)
+            .SumAsync(i => i.numberOfLates ?? 0);
 
-            var totalLates = await _databaseContext.DailyAttendanceReports.Where(i => i.attendanceDate.Month == date.Month)
-               .Select(i => i.numberOfLates).CountAsync();
 
-            int weekDays = WeekDaysCounter.WeeekDayCounter(date);
+            //REMAIN DEFAULT FOR THE CURRENT MONTH
+            int weekDays = WeekDaysCounter.WeeekDayCounter(date);        
+            var absentRate = (double)(totalAbsents / weekDays) * 100;
+            var lateRate = (double)(totalLates / weekDays) * 100;
 
-            var absentRate = (double) (totalAbsents / weekDays) * 100;
-            var lateRate = (double) (totalLates / weekDays) * 100;
             List<DailyAttendanceReport> attendanceTrend = await _databaseContext.DailyAttendanceReports
                 .Where(i => i.attendanceDate.Month == date.Month && i.attendanceDate.Year == date.Year).ToListAsync();
 
             return new HrDashBoardVM
             {
                 NumberOfActiveStudents = numberOfActiveStudents,
-                FinishingStudents = NumOfFinishingStudents,
                 PendingStudents = pendingStatus,
                 FullName = $"{UserData.FirstName} {UserData.MiddleName} {UserData.LastName}",
                 monthLateRate = absentRate,
                 monthAbsentism = totalAbsents,
                 attendanceTrend = attendanceTrend,
-               
             };
+
         }
 
         //BACKGROUND SERVICE 

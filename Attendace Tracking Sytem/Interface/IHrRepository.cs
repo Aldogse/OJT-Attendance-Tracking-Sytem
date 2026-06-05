@@ -9,7 +9,7 @@ namespace Attendace_Tracking_Sytem.Interface
 {
     public interface IHrRepository
     {
-        Task<HrDashBoardVM> HrDashboardInformation(string UserId);
+        Task<HrDashBoardVM> HrDashboardInformation(string UserId,DateOnly? startDate,DateOnly? endDate);
         Task ApproveStudentWorkProfile(int Id);
         Task DenyStudentWorkProfile(int Id);
         Task<List<StudentLogs>> MissedTimeOuts(DateOnly date);
