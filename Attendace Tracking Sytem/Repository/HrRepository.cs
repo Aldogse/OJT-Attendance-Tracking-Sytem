@@ -100,6 +100,8 @@ namespace Attendace_Tracking_Sytem.Repository
             List<DailyAttendanceReport> attendanceTrend = await _databaseContext.DailyAttendanceReports
                 .Where(i => i.attendanceDate.Month == date.Month && i.attendanceDate.Year == date.Year).ToListAsync();
 
+            var studentAbsents = await GetStudentWith3absencesOrMore();
+
             return new HrDashBoardVM
             {
                 NumberOfActiveStudents = numberOfActiveStudents,
@@ -108,6 +110,7 @@ namespace Attendace_Tracking_Sytem.Repository
                 monthLateRate = absentRate,
                 monthAbsentism = totalAbsents,
                 attendanceTrend = attendanceTrend,
+                absentDetails = studentAbsents
             };
 
         }
@@ -308,6 +311,29 @@ namespace Attendace_Tracking_Sytem.Repository
             };
 
             return results;
+        }
+
+        public async Task<List<AbsentStudentDetails>> GetStudentWith3absencesOrMore()
+        {
+            var students = await _databaseContext.StudentLogs.Where(log => log.isAbsent)
+                .GroupBy(i => i.ProfileId)
+                .Where(i => i.Count() >= 3)
+                .Select(i => i.Key)
+                .ToListAsync();
+
+           List<AbsentStudentDetails> profiles = [];
+
+            foreach(var st in students)
+            {
+                var stp = await _databaseContext.StudentsProfile.Where(i => i.ProfileId == st)
+                    .Select(i => new AbsentStudentDetails
+                    {
+
+                    }).FirstOrDefaultAsync();
+
+               profiles.Add(stp);
+            }
+            return profiles;
         }
     }
 }

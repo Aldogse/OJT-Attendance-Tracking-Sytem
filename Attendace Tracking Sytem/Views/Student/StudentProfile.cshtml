@@ -1,0 +1,91 @@
+﻿@model Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM.StudentProfileVM
+
+@{
+    Layout = "~/Views/Shared/StudentSidebarLayout.cshtml";
+}
+
+<div class="card-header bg-primary text-white" style="text-align: center">
+    <h3 class="mb-0">Student Profile</h3>
+</div>
+
+@{
+    if (TempData["Success"] != null)
+    {
+        <h1 style="background-color:green">@TempData["Success"]</h1>
+    }
+}
+<form asp-controller="Student" asp-action="StudentProfileUpdate" method="post">
+
+    <div class="row">
+
+        <div class="col-md-4 mb-3">
+            <label>First Name</label>
+            <input asp-for="Firstname"
+                   class="form-control profile-input"
+                   readonly />
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label>Middle Name</label>
+            <input asp-for="MiddleName"
+                   class="form-control profile-input"
+                   readonly />
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label>Last Name</label>
+            <input asp-for="LastName"
+                   class="form-control profile-input"
+                   readonly />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label>Age</label>
+            <input asp-for="Age"
+                   class="form-control profile-input"
+                   readonly />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label>Phone Number</label>
+            <input asp-for="PhoneNumber"
+                   class="form-control profile-input"
+                   readonly />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label>School</label>
+            <input asp-for="School"
+                   class="form-control profile-input"
+                   readonly />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label>Department</label>
+            <input asp-for="Department"
+                   class="form-control profile-input"
+                   readonly />
+        </div>
+
+    </div>
+
+    <div class="text-end">
+
+        <button type="button"
+                id="editBtn"
+                class="btn btn-primary">
+            Edit Information
+        </button>
+
+        <button type="submit"
+                id="saveBtn"
+                class="btn btn-success d-none">
+            Save Changes
+        </button>
+
+    </div>
+
+</form>
+
+<script src="~/js/studentProfile.js"></script>
+    

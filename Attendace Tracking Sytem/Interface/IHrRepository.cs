@@ -22,5 +22,8 @@ namespace Attendace_Tracking_Sytem.Interface
         Task<StudentLogSummaryVM> GetStudentLogSummary(int ProfileId,int page = 1,DateOnly? StartDate = null,DateOnly? EndDate = null);
         //DATE RANGE
         Task<DailyAttendanceReportVM> DailyAttendanceReport(DateOnly? start, DateOnly? end);
+
+        //NOTIFY HR BY EMAIL AND POST IT AS A LIST IN THE DASHBOARD
+        Task<List<AbsentStudentDetails>> GetStudentWith3absencesOrMore();
     }
 }

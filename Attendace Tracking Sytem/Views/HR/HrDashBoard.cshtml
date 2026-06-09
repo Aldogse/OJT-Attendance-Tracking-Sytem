@@ -156,6 +156,62 @@
             </div>
         </div>
 
+        <!-- STUDENTS WITH 3+ ABSENCES -->
+        <div class="card dashboard-card mb-4">
+
+            <div class="card-body">
+
+                <h5 class="fw-bold mb-3 text-danger">
+                    Students With 3 or More Absences
+                </h5>
+
+                @if (Model.absentDetails != null &&
+                                Model.absentDetails.Any())
+                {
+                    <div class="table-responsive">
+
+                        <table class="table table-hover align-middle">
+
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>School</th>
+                                    <th>Department</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var student in Model.absentDetails)
+                                {
+                                    <tr>
+                                        <td>@student.StudentId</td>
+                                        <td>@student.FirstName</td>
+                                        <td>@student.Lastname</td>
+                                        <td>@student.School</td>
+                                        <td>@student.Department</td>
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-success mb-0">
+                        No student has 3 or more absences.
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 

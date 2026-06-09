@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Attendace_Tracking_Sytem.Database;
+using Attendace_Tracking_Sytem.DTO;
 using Attendace_Tracking_Sytem.Interface;
 using Attendace_Tracking_Sytem.Models;
 using Attendace_Tracking_Sytem.Models.StudentProfiles;
@@ -450,8 +451,58 @@ namespace Attendace_Tracking_Sytem.Controllers
                             TotalHours = i.TotalHours,
                         }).ToListAsync();
                 }
-
                 return View (logs);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> StudentProfile()
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+            var student = await _databaseContext.StudentsProfile.FirstOrDefaultAsync(i => i.UserId == userId);
+
+            if(student == null)
+            {
+                return View("Error");
+            }
+
+            var studentData = new StudentProfileVM
+            {
+                Firstname = student.FirstName,
+                Age = student.Age,
+                Department = student.Department,
+                PhoneNumber = student.PhoneNumber,
+                LastName = student.LastName,
+                MiddleName = student.MiddleName,
+                StudentId = student.StudentId,
+                School = student.School,
+            };
+
+            return View(studentData);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> StudentProfileUpdate([FromForm]studentProfileDTO studentProfileDTO)
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+            var student = await _databaseContext.StudentsProfile.FirstOrDefaultAsync(i => i.UserId == userId);
+
+            if(student == null)
+            {
+                return View("Error");
+            }
+
+            student.FirstName = studentProfileDTO?.FirstName ?? string.Empty;
+            student.LastName = studentProfileDTO?.LastName ?? string.Empty;
+            student.Department = studentProfileDTO.Department;
+            student.Age = studentProfileDTO.Age;
+            student.MiddleName = studentProfileDTO.MiddleName;
+            student.School = studentProfileDTO.School;
+            student.StudentId = studentProfileDTO.StudentId;
+            student.PhoneNumber = studentProfileDTO.PhoneNumber;
+
+            await _databaseContext.SaveChangesAsync();
+            TempData["Success"] = "Details successfully updated";
+            return RedirectToAction(nameof(StudentProfile));
         }
 
     }

@@ -15,5 +15,6 @@ namespace Attendace_Tracking_Sytem.ViewModels.HR_DASHBOARD_VM
         public double? monthAbsentism { get; set; }
         public double? monthLateRate { get; set; }
         public List<DailyAttendanceReport>? attendanceTrend {  get; set; }
+        public List<AbsentStudentDetails>? absentDetails { get; set; }
     }
 }

@@ -58,6 +58,7 @@ namespace Attendace_Tracking_Sytem.Models.StudentProfiles
         public TimeOnly ShiftStart { get; set; } = new TimeOnly(8, 0);
         public TimeOnly ShiftEnd { get; set; } = new TimeOnly(17, 0);
         public Status Status { get; set; } = Status.Pending;
+        public bool AbsentismNotified { get; set; } = false;
 
         //CREDENTIALS ID
         [ForeignKey("User")]
