@@ -1,0 +1,115 @@
+﻿@model Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM.CertificateVM
+
+@{
+    ViewData["Title"] = "Certificate of Completion";
+}
+
+<link href="~/css/Student/studentCertificate.css"
+      rel="stylesheet" />
+
+<div class="container">
+
+    <div class="text-end mb-3 no-print">
+        <button onclick="window.print()"
+                class="btn btn-primary">
+            Print Certificate
+        </button>
+    </div>
+
+    <div class="certificate">
+
+        <div class="text-center">
+
+            <!-- Company Logo -->
+            <img src="~/students/images/Logo.png"
+                 alt="Company Logo"
+                 height="100"
+                 class="mb-4" />
+
+            <h1 class="certificate-title">
+                Certificate of Completion
+            </h1>
+
+            <p class="certificate-subtitle">
+                ON-THE-JOB TRAINING PROGRAM
+            </p>
+
+            <div class="mt-5">
+
+                <p class="fs-5">
+                    This certificate is proudly presented to
+                </p>
+
+                <div class="student-name">
+                    @Model.FullName
+                </div>
+
+                <div class="certificate-body mt-4">
+
+                    <p>
+                        for successfully completing the
+                        On-the-Job Training Program and fulfilling
+                        all required internship obligations.
+                    </p>
+
+                    <p>
+                        School:
+                        <strong>@Model.School</strong>
+                    </p>
+
+                    <p>
+                        Department:
+                        <strong>@Model.Department</strong>
+                    </p>
+
+                    <p>
+                        Total Hours Rendered:
+                        <strong>@Model.HoursRendered Hours</strong>
+                    </p>
+
+                    <p>
+                        Completion Date:
+                        <strong>
+                            @Model.EndDate.ToString("MMMM dd, yyyy")
+                        </strong>
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="row certificate-footer text-center mt-5">
+
+            <div class="col-6">
+
+                <img src="~/students/images/Signature.png"
+                     alt="HR Signature"
+                     class="signature-image" />
+
+                <div class="signature-line">
+                    <strong>Jane Doe</strong><br />
+                    HR Supervisor
+                </div>
+
+            </div>
+
+            <div class="col-6">
+
+                <img src="~/students/images/Signature.png"
+                     alt="Company Representative Signature"
+                     class="signature-image" />
+
+                <div class="signature-line">
+                    <strong>John Smith</strong><br />
+                    Company Representative
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

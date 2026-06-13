@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Attendace_Tracking_Sytem.Interface
+@inject  IStudentRepository StudentRepository
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -17,7 +20,12 @@
 </head>
 
 <body>
-    
+
+    @{
+        var user = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var students = await StudentRepository.GetStudentByUserId(user); ;
+    }
+
     <div class="d-flex">
 
         <!-- SIDEBAR -->
@@ -58,7 +66,17 @@
                    asp-action="StudentRequirementUploadPage">
                     <i class="bi bi-folder-check me-2"></i> Upload Requirements
                 </a>
-
+@* 
+                @if (students.HoursRendered >= TimeSpan.FromHours(300))
+                { *@
+                    <a class="nav-link text-white mb-2"
+                    asp-controller="Student"
+                    asp-action="CertificatePage"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                        <i class="bi bi-folder-check me-2"></i> Certificate
+                    </a>
+                @* } *@
             </nav>
 
         </div>

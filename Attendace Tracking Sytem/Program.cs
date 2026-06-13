@@ -9,9 +9,9 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
-using DotNetEnv;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 
-Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -24,12 +24,17 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 
 builder.Services.AddIdentity<LogInCredentials,IdentityRole>()
     .AddEntityFrameworkStores<DatabaseContext>()
-    .AddDefaultTokenProviders();    
+    .AddDefaultTokenProviders();
+
+builder.Services.AddSingleton(typeof(IConverter),
+    new SynchronizedConverter(new PdfTools()));
     
 builder.Services.AddScoped<IRegistrationRepository,RegistrationRepository>();
 builder.Services.AddScoped<IHrRepository, HrRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<EmailServices>();
+builder.Services.AddScoped<PdfService>();
+builder.Services.AddScoped<IViewRenderService,ViewRenderService>();
 
 //SET UP EMAIL SERRVICE
 builder.Services.Configure<BrevoSettings>(

@@ -133,6 +133,7 @@ namespace Attendace_Tracking_Sytem.Controllers
                 await _studentRepository.ClockIn(student.ProfileId,student.ShiftStart);
                 return RedirectToAction("StudentDashboard", "Student");
 
+
         }
 
         [HttpPost]
@@ -503,6 +504,29 @@ namespace Attendace_Tracking_Sytem.Controllers
             await _databaseContext.SaveChangesAsync();
             TempData["Success"] = "Details successfully updated";
             return RedirectToAction(nameof(StudentProfile));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CertificatePage()
+        {
+            var user =  User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+            var student = await _databaseContext.StudentsProfile.FirstOrDefaultAsync(i => i.UserId == user);
+
+            if(student == null)
+            {
+                return View("Error");
+            }
+
+            var viewModel = new CertificateVM
+            {
+                FullName = $"{student.FirstName} {student.MiddleName} {student.LastName}",
+                Department = student.Department,
+                EndDate = student.EndDate,
+                HoursRendered = student.HoursRendered,
+                School = student.School,
+            };
+
+            return View(viewModel);
         }
 
     }

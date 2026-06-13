@@ -359,5 +359,10 @@ namespace Attendace_Tracking_Sytem.Repository
             return attendanceReport;
 
         }
+
+        public async Task<StudentProfile> GetStudentByUserId(string userId)
+        {
+            return await _databaseContext.StudentsProfile.FirstOrDefaultAsync(i => i.UserId == userId);
+        }
     }
 }

@@ -93,9 +93,9 @@ namespace Attendace_Tracking_Sytem.Repository
 
 
             //REMAIN DEFAULT FOR THE CURRENT MONTH
-            int weekDays = WeekDaysCounter.WeeekDayCounter(date);        
-            var absentRate = (double)(totalAbsents / weekDays) * 100;
-            var lateRate = (double)(totalLates / weekDays) * 100;
+            int weekdays = date.WeeekDayCounter();        
+            var absentRate = totalAbsents.ToPercentageOf(weekdays);
+            var lateRate = totalLates.ToPercentage(weekdays);
 
             List<DailyAttendanceReport> attendanceTrend = await _databaseContext.DailyAttendanceReports
                 .Where(i => i.attendanceDate.Month == date.Month && i.attendanceDate.Year == date.Year).ToListAsync();

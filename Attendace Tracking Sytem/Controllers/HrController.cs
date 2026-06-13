@@ -109,6 +109,7 @@ namespace Attendace_Tracking_Sytem.Controllers
         {
 
             var UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userProfile = await _databaseContext.StudentsProfile.FirstOrDefaultAsync(i => i.UserId == UserId);
 
             if (UserId == null)
             {
