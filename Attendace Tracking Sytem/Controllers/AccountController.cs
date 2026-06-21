@@ -7,6 +7,7 @@ using Attendace_Tracking_Sytem.ViewModels.Account_Pages_VM;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Attendace_Tracking_Sytem.Database;
+using Attendace_Tracking_Sytem.Interface;
 
 namespace Attendace_Tracking_Sytem.Controllers
 {
@@ -16,16 +17,19 @@ namespace Attendace_Tracking_Sytem.Controllers
         private readonly SignInManager<LogInCredentials> _signInManager;
         private readonly ILogger<AccountController> _logger;
         private readonly DatabaseContext _databaseContext;
+        private readonly IJwtService _jwtService;
 
         public AccountController(UserManager<LogInCredentials> userManager,
             SignInManager<LogInCredentials> signInManager,
             ILogger<AccountController> logger,
-            DatabaseContext databaseContext)
+            DatabaseContext databaseContext,
+            IJwtService jwtService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _databaseContext = databaseContext;
+            _jwtService = jwtService;
         }
 
         [HttpGet]
@@ -139,12 +143,11 @@ namespace Attendace_Tracking_Sytem.Controllers
                 ModelState.AddModelError("", "Invalid Input!");
                 return View(loginCredentials);
             }
-
             var user = await _userManager.FindByEmailAsync(loginCredentials.EmailAddress);
 
             if (user == null)
             {
-                ModelState.AddModelError("", "Profile not found!");
+                ModelState.AddModelError("", "Email not found!");
                 return View(loginCredentials);
             }
 
@@ -160,10 +163,12 @@ namespace Attendace_Tracking_Sytem.Controllers
                 return RedirectToAction("StudentProfileForm", "Student", new { UserId = user.Id });
             }
 
-            var result = await _signInManager.PasswordSignInAsync(user.Email!, loginCredentials.Password, false, false);
-
+         var result = await _signInManager.PasswordSignInAsync(user.Email!, loginCredentials.Password, false, false);
             if (result.Succeeded)
             {
+                //GENERATE JWT TOKEN ONCE LOG IN IS SUCCESS
+                await _jwtService.GenerateToken(user);
+
                 if (await _userManager.IsInRoleAsync(user, "Student"))
                 {
                     //check if the profile has been approved, if not route success page
@@ -187,7 +192,7 @@ namespace Attendace_Tracking_Sytem.Controllers
                 }
             }
 
-            ModelState.AddModelError("", "Invalid Email or Password");
+            ModelState.AddModelError("", "Invalid Username or Password");
             return View(loginCredentials);
 
         }

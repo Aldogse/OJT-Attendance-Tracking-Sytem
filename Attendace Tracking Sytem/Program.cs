@@ -11,8 +11,27 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using DinkToPdf;
 using DinkToPdf.Contracts;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//JWT CONFIGURATIONS
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuers"],
+            ValidAudience = builder.Configuration["Jwt:Audiences"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Token"]))
+        };
+    });
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -35,6 +54,8 @@ builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<EmailServices>();
 builder.Services.AddScoped<PdfService>();
 builder.Services.AddScoped<IViewRenderService,ViewRenderService>();
+builder.Services.AddScoped<IJwtService,JwtService>();
+
 
 //SET UP EMAIL SERRVICE
 builder.Services.Configure<BrevoSettings>(
@@ -48,6 +69,8 @@ builder.Services.Configure<BrevoSettings>(
 
 var app = builder.Build();
 
+
+//ROLE SEEDER
 using (var scope = app.Services.CreateScope())
 {
     var roles = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();

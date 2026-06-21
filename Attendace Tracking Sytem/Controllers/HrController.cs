@@ -12,6 +12,7 @@ using Attendace_Tracking_Sytem.Repository;
 using Attendace_Tracking_Sytem.Services;
 using Attendace_Tracking_Sytem.ViewModels.HR_PAGES_VM;
 using Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -104,6 +105,7 @@ namespace Attendace_Tracking_Sytem.Controllers
 
        }
 
+        [Authorize(Roles ="HR")]
         [HttpGet]
         public async Task<IActionResult> HrDashBoard([FromQuery]DateOnly? startDate,[FromQuery]DateOnly? endDate)
         {
@@ -283,7 +285,6 @@ namespace Attendace_Tracking_Sytem.Controllers
             TempData["VerifySuccess"] = "Documents Verified!";
             return RedirectToAction(nameof(StudentRequirements));
         }
-
 
         [HttpGet]
         public async Task<IActionResult> StudentDailyAttendanceReport([FromQuery]DateOnly? start, [FromQuery]DateOnly? end)
