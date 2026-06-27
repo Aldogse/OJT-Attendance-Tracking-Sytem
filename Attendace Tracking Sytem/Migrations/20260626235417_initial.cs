@@ -32,7 +32,6 @@ namespace Attendace_Tracking_Sytem.Migrations
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastLogin = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     ProfileCompleted = table.Column<bool>(type: "boolean", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -53,6 +52,42 @@ namespace Attendace_Tracking_Sytem.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DailyAttendanceReports",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    numberOfAbsents = table.Column<int>(type: "integer", nullable: true),
+                    numberOfLates = table.Column<int>(type: "integer", nullable: true),
+                    numberOfPresent = table.Column<int>(type: "integer", nullable: true),
+                    attendanceDate = table.Column<DateOnly>(type: "date", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DailyAttendanceReports", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudentApplications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FullName = table.Column<string>(type: "text", nullable: false),
+                    School = table.Column<string>(type: "text", nullable: false),
+                    Course = table.Column<string>(type: "text", nullable: false),
+                    ResumePath = table.Column<string>(type: "text", nullable: true),
+                    Year = table.Column<int>(type: "integer", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    ApplicationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudentApplications", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -284,8 +319,11 @@ namespace Attendace_Tracking_Sytem.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     StudentProfileId = table.Column<int>(type: "integer", nullable: false),
                     NbiImagePath = table.Column<string>(type: "text", nullable: true),
+                    NbiImagePublicId = table.Column<string>(type: "text", nullable: true),
                     MemorandumOfAgreementImagePath = table.Column<string>(type: "text", nullable: true),
+                    MemorandumOfAgreementImagePublicId = table.Column<string>(type: "text", nullable: true),
                     StudentIdImagePath = table.Column<string>(type: "text", nullable: true),
+                    StudentIdImagePublicId = table.Column<string>(type: "text", nullable: true),
                     Verified = table.Column<bool>(type: "boolean", nullable: false),
                     Message = table.Column<string>(type: "text", nullable: true)
                 },
@@ -387,7 +425,13 @@ namespace Attendace_Tracking_Sytem.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "DailyAttendanceReports");
+
+            migrationBuilder.DropTable(
                 name: "MissedTimeouts");
+
+            migrationBuilder.DropTable(
+                name: "StudentApplications");
 
             migrationBuilder.DropTable(
                 name: "StudentLogs");

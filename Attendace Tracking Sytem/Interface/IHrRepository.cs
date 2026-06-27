@@ -25,5 +25,9 @@ namespace Attendace_Tracking_Sytem.Interface
 
         //NOTIFY HR BY EMAIL AND POST IT AS A LIST IN THE DASHBOARD
         Task<List<AbsentStudentDetails>> GetStudentWith3absencesOrMore();
+
+        //APPLICATIONS
+        Task<List<StudentApplicationsVM>> GetStudentApplicants(int page ,int size);
+        Task<StudentApplicationsVM> GetStudentApplication(int ApplicationId);
     }
 }

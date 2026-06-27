@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Attendace_Tracking_Sytem.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20260531074328_added new table for daily attendance track")]
-    partial class addednewtablefordailyattendancetrack
+    [Migration("20260626235417_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -106,13 +106,16 @@ namespace Attendace_Tracking_Sytem.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("attendanceDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("attendanceDate")
+                        .HasColumnType("date");
 
                     b.Property<int?>("numberOfAbsents")
                         .HasColumnType("integer");
 
                     b.Property<int?>("numberOfLates")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("numberOfPresent")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -207,6 +210,48 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.HasIndex("ProfileId");
 
                     b.ToTable("MissedTimeouts");
+                });
+
+            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentApplication", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ApplicationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Course")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ResumePath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("School")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StudentApplications");
                 });
 
             modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentLogs", b =>
@@ -340,13 +385,22 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.Property<string>("MemorandumOfAgreementImagePath")
                         .HasColumnType("text");
 
+                    b.Property<string>("MemorandumOfAgreementImagePublicId")
+                        .HasColumnType("text");
+
                     b.Property<string>("Message")
                         .HasColumnType("text");
 
                     b.Property<string>("NbiImagePath")
                         .HasColumnType("text");
 
+                    b.Property<string>("NbiImagePublicId")
+                        .HasColumnType("text");
+
                     b.Property<string>("StudentIdImagePath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("StudentIdImagePublicId")
                         .HasColumnType("text");
 
                     b.Property<int>("StudentProfileId")

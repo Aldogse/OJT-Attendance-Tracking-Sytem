@@ -335,5 +335,49 @@ namespace Attendace_Tracking_Sytem.Repository
             }
             return profiles;
         }
+
+        public async Task<List<StudentApplicationsVM>> GetStudentApplicants(int page, int size)
+        {
+             
+            var applications = await _databaseContext.StudentApplications.Select(i => new StudentApplicationsVM
+            {
+                ApplicationDate = i.ApplicationDate,
+                Course = i.Course,
+                Description = i.Description,
+                FullName = i.FullName,
+                ResumePath = i.ResumePath,
+                School = i.School,
+                Status = i.Status,
+                Year = i.Year,
+            })
+                .Skip((page - 1) * size)
+                .Take(size)
+                .OrderBy(i => i.ApplicationDate)
+                .ToListAsync();
+
+            return applications;
+        }
+
+        public async Task<StudentApplicationsVM> GetStudentApplication(int ApplicationId)
+        {
+            var applicant = await _databaseContext.StudentApplications.FirstOrDefaultAsync(i => i.Id == ApplicationId);
+
+            if (applicant == null)
+            {
+                return null;
+            }
+
+            return new StudentApplicationsVM
+            {
+                ApplicationDate = applicant.ApplicationDate,
+                Course = applicant.Course,
+                Description = applicant.Description,
+                FullName = applicant.FullName,
+                ResumePath = applicant.ResumePath,
+                School = applicant.School,
+                Status = applicant.Status,
+                Year = applicant.Year,
+            };
+        }
     }
 }

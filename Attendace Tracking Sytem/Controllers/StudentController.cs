@@ -247,7 +247,7 @@ namespace Attendace_Tracking_Sytem.Controllers
                    return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
-                bool uploadResult =  await _studentRepository.UploadNBI(ProfileId, NBIFile, fileExt);
+                bool uploadResult =  await _studentRepository.UploadNBI(ProfileId,NBIFile);
 
                 if(!uploadResult)
                 {
@@ -298,7 +298,7 @@ namespace Attendace_Tracking_Sytem.Controllers
                     return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
-                bool upload = await _studentRepository.UploadMOA(ProfileId, MOAFile, fileExt);
+                bool upload = await _studentRepository.UploadMOA(ProfileId, MOAFile);
 
                 if (!upload)
                 {
@@ -345,7 +345,7 @@ namespace Attendace_Tracking_Sytem.Controllers
                     return RedirectToAction("StudentRequirementUploadPage", "Student");
                 }
 
-                bool uploadImage = await _studentRepository.UploadProfilePicture(StudentIdFile, ProfileId,fileExt);
+                bool uploadImage = await _studentRepository.UploadProfilePicture(StudentIdFile, ProfileId);
 
                 if (!uploadImage)
                 {
@@ -529,5 +529,34 @@ namespace Attendace_Tracking_Sytem.Controllers
             return View(viewModel);
         }
 
+        [HttpGet]
+        public IActionResult StudentApplicationPage()
+        {
+            return View(new StudentApplicationDTO());
+        }
+
+        [HttpGet]
+        public IActionResult ApplicationSuccessPage()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> StudentApplicationPage(StudentApplicationDTO studentApplicationDTO)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+     
+            var extension = Path.GetExtension(studentApplicationDTO.Resume.FileName).ToLower() ?? "";
+            var application = await _studentRepository.StudentApplicationProcess(studentApplicationDTO,extension);
+
+            return RedirectToAction(nameof(ApplicationSuccessPage));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PendingStudentApplications()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

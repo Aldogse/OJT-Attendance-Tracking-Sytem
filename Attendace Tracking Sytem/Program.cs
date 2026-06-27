@@ -16,12 +16,12 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using DotNetEnv;
 using DotNetEnv.Configuration;
+using CloudinaryDotNet;
+using Microsoft.Extensions.Options;
 
-Console.WriteLine("STARTING .env LOAD");
-Env.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddEnvironmentVariables();
 //JWT CONFIGURATIONS
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -40,12 +40,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+//DATABASE
 builder.Services.AddDbContext<DatabaseContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default"));
 });
 
-
+  
 builder.Services.AddIdentity<LogInCredentials,IdentityRole>()
     .AddEntityFrameworkStores<DatabaseContext>()
     .AddDefaultTokenProviders();
@@ -60,12 +62,27 @@ builder.Services.AddScoped<EmailServices>();
 builder.Services.AddScoped<PdfService>();
 builder.Services.AddScoped<IViewRenderService,ViewRenderService>();
 builder.Services.AddScoped<IJwtService,JwtService>();
+builder.Services.AddScoped<CloudinaryService>();
 
 
-//SET UP EMAIL SERRVICE
+//BREVO SETTINGS
 builder.Services.Configure<BrevoSettings>(
   builder.Configuration.GetSection("BrevoSettings")    
 );
+
+//CLOUDINARY SETTINGS
+builder.Services.Configure<CloudinarySettings>(
+    builder.Configuration.GetSection("CloudinarySettings")
+);
+
+//CLOUDINARY ACCOUNT
+builder.Services.AddSingleton<Cloudinary>(provider =>
+{
+    var settings = provider.GetRequiredService<IOptions<CloudinarySettings>>().Value;
+    var account = new Account(settings.CloudName,settings.ApiKey,settings.ApiSecret);
+    return new Cloudinary(account);
+
+});
 
 //BACKGROUND SERVICES
 //builder.Services.AddHostedService<LogCheckBackgroundService>();

@@ -209,6 +209,48 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.ToTable("MissedTimeouts");
                 });
 
+            modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentApplication", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ApplicationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Course")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ResumePath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("School")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StudentApplications");
+                });
+
             modelBuilder.Entity("Attendace_Tracking_Sytem.Models.StudentProfiles.StudentLogs", b =>
                 {
                     b.Property<int>("LogId")
@@ -340,13 +382,22 @@ namespace Attendace_Tracking_Sytem.Migrations
                     b.Property<string>("MemorandumOfAgreementImagePath")
                         .HasColumnType("text");
 
+                    b.Property<string>("MemorandumOfAgreementImagePublicId")
+                        .HasColumnType("text");
+
                     b.Property<string>("Message")
                         .HasColumnType("text");
 
                     b.Property<string>("NbiImagePath")
                         .HasColumnType("text");
 
+                    b.Property<string>("NbiImagePublicId")
+                        .HasColumnType("text");
+
                     b.Property<string>("StudentIdImagePath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("StudentIdImagePublicId")
                         .HasColumnType("text");
 
                     b.Property<int>("StudentProfileId")

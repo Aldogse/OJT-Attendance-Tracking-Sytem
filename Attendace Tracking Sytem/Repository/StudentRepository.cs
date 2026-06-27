@@ -3,12 +3,16 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using AspNetCoreGeneratedDocument;
 using Attendace_Tracking_Sytem.Database;
+using Attendace_Tracking_Sytem.DTO;
 using Attendace_Tracking_Sytem.Interface;
 using Attendace_Tracking_Sytem.Models.HR_Profiles;
 using Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS;
 using Attendace_Tracking_Sytem.Models.StudentProfiles;
+using Attendace_Tracking_Sytem.Services;
 using Attendace_Tracking_Sytem.ViewModels.HR_PAGES_VM;
 using Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
@@ -19,19 +23,23 @@ namespace Attendace_Tracking_Sytem.Repository
     {
         private readonly DatabaseContext _databaseContext;
         private readonly ILogger<StudentRepository> _logger;
+        private readonly CloudinaryService _cloudinaryService;
+        private readonly Cloudinary _cloudinary;
 
-        public StudentRepository(DatabaseContext databaseContext,ILogger<StudentRepository>logger)
+        public StudentRepository(DatabaseContext databaseContext,ILogger<StudentRepository>logger,CloudinaryService cloudinaryService,Cloudinary cloudinary)
         {
             _databaseContext = databaseContext;
             _logger = logger;
+            _cloudinaryService = cloudinaryService;
+            _cloudinary = cloudinary;
         }
 
         public async Task DroppedStudentWorkProfile(int Id)
         {
         }
-
+      
         public async Task<StudentProfile> PendingStudentWorkProfile(int ProfileId)
-        {
+        { 
             StudentProfile? studentWorkProfile = await _databaseContext.StudentsProfile
                 .Where(i => i.ProfileId == ProfileId)
                 .FirstOrDefaultAsync();
@@ -148,183 +156,101 @@ namespace Attendace_Tracking_Sytem.Repository
             return logs;
         }
 
-        public async Task<bool> UploadNBI(int ProfileId, IFormFile file,string? ext)
+        public async Task<bool> UploadNBI(int ProfileId, IFormFile file)
         {
             var student = await  _databaseContext.StudentRequirements.FirstOrDefaultAsync(i => i.StudentProfileId == ProfileId);
-            var NbiFilename = Guid.NewGuid().ToString() + ext;
-
-            var folderPath = Path.Combine
-                (
-                Directory.GetCurrentDirectory(),
-                "wwwroot", "students", "images"
-                );
-
-            //combine the path
-            var filePath = Path.Combine(folderPath, NbiFilename);
-
-            if (student == null)
-            {
-                var newNbiImage = new StudentRequirements()
-                {
-                    NbiImagePath = $"/students/images/{NbiFilename}",
-                    StudentProfileId = ProfileId,                                       
-                };
-                //Create folder path if it doesn't exist
-                Directory.CreateDirectory(folderPath);
-
-                //SAVE THE FILE ON THE SERVER 
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                await _databaseContext.StudentRequirements.AddAsync(newNbiImage);
-                await _databaseContext.SaveChangesAsync();
-                return true;
-            }
-
-            //UPLOAD LOGIC
-
-            //DELETE OLD IMAGE IF IT EXISTS 
-            if (!string.IsNullOrEmpty(student.NbiImagePath))
-            {
-                var oldPath = Path.Combine
-                (
-                    Directory.GetCurrentDirectory(), 
-                    "wwwroot", 
-                    student.NbiImagePath.TrimStart('/')                  
-                );
-
-                //DELETE EXISTING FILE
-                if (System.IO.File.Exists(oldPath))
-                {
-                    System.IO.File.Delete(oldPath);
-                }
-            }
-
-            //Create folder path if it doesn't exist
-            Directory.CreateDirectory(folderPath);
-
-            //SAVE THE FILE ON THE SERVER 
-            using (var stream = new FileStream(filePath,FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            //SAVE THE PATH TO THE DATABASE
-            student.NbiImagePath = $"/students/images/{NbiFilename}";
-
-            await _databaseContext.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> UploadMOA(int ProfileId, IFormFile file, string? ext)
-        {
-            var student = await _databaseContext.StudentRequirements.FirstOrDefaultAsync(i => i.StudentProfileId == ProfileId);
-
-            var newMOAFilename = Guid.NewGuid().ToString() + ext;
-
-            var folderPath = Path.Combine
-           (
-                Directory.GetCurrentDirectory(),
-                "wwwroot",
-                "students",
-                "images"
-           );
-
-            //CREATE FOLDER PATH IF IT DOESN'T EXIST
-            Directory.CreateDirectory(folderPath);
-
-            var newMOAFilePath = Path.Combine(folderPath, newMOAFilename);       
-
-            if (student == null)
-            {
-                var newMOAImage = new StudentRequirements()
-                {
-                    StudentProfileId = ProfileId,
-                    MemorandumOfAgreementImagePath = $"/students/images/{newMOAFilename}"
-                };
-
-                using (var stream = new FileStream(newMOAFilePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                await _databaseContext.StudentRequirements.AddAsync(newMOAImage);
-                await _databaseContext.SaveChangesAsync();
-                return true;
-            }
-
-            //UPLOAD LOGIC
-            //DELETE OLD FILE PATH
-            if (!string.IsNullOrEmpty(student.MemorandumOfAgreementImagePath))
-            {
-                var oldPath = Path.Combine(
-                 Directory.GetCurrentDirectory(),
-                 "wwwroot",
-                  student.MemorandumOfAgreementImagePath.TrimStart('/')
-                );
-
-                //DELETE THE OLD PATH
-                if(System.IO.File.Exists(oldPath))
-                {
-                    System.IO.File.Delete(oldPath);
-                }
-            }      
-            //save file on the server 
-            using (var stream = new FileStream(newMOAFilePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            student.MemorandumOfAgreementImagePath = $"/students/images/{newMOAFilename}";
-
-            await _databaseContext.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> UploadProfilePicture(IFormFile file, int ProfileId, string? ext)
-        {
-            var student = await _databaseContext.StudentRequirements.FirstOrDefaultAsync(i => i.StudentProfileId == ProfileId);
 
             if (student == null)
             {
                 return false;
             }
 
-            //icheck kung may picture yung student pag meron burahin at palitan nung bagong picture
-            if (!string.IsNullOrEmpty(student.StudentIdImagePath))
+            if (student.NbiImagePath != null)
             {
-                var oldPath = Path.Combine
-                    (
-                      Directory.GetCurrentDirectory(),
-                      "wwwroot",
-                      student.StudentIdImagePath.TrimStart('/')
-                    );
+                //DELETE EXISTING FILE IN CLOUDINARY
+                var deleteParams = new DeletionParams(student.NbiImagePublicId)
+                {
+                    ResourceType = ResourceType.Image,
+                    Invalidate = true
+                };
 
-                if(File.Exists(oldPath))
-                    File.Delete(oldPath);
-
+                await _cloudinary.DestroyAsync(deleteParams);
+                var newNBIPath = await _cloudinaryService.UploadImage(file);
+                //ADD NEW IMAGE 
+                student.NbiImagePath = newNBIPath.ImageUrlPath;
+                student.NbiImagePublicId = newNBIPath.ImageId;
+                await _databaseContext.SaveChangesAsync();
+                return true;
             }
 
-            var newImageName = Guid.NewGuid().ToString() + ext;
+            var NBIPath = await _cloudinaryService.UploadImage(file);
+            //ADD NEW IMAGE 
+            student.NbiImagePath = NBIPath.ImageUrlPath;
+            student.NbiImagePublicId = NBIPath.ImageId;
+            await _databaseContext.SaveChangesAsync();
 
-            var folder = Path.Combine
-                (
-                 Directory.GetCurrentDirectory(),
-                 "wwwroot",
-                 "students",
-                 "images"
-                );
+            return true;
+        }
 
-            Directory.CreateDirectory(folder);
-            var newImageFolderPath = Path.Combine(folder, newImageName);
+        public async Task<bool> UploadMOA(int ProfileId, IFormFile file)
+        {
+            var student = await _databaseContext.StudentRequirements.FirstOrDefaultAsync(i => i.StudentProfileId == ProfileId);
 
+            if (student == null)
+                return false;
 
-            using var stream = new FileStream(newImageFolderPath, FileMode.Create);
-            await file.CopyToAsync(stream);
+            //IF THERE IS AN EXISTING PICTURE DELETE IT AND UPLOAD A NEW ONE
+            if(student.MemorandumOfAgreementImagePath != null)
+            {
+                var deleteParam = new DeletionParams(student.MemorandumOfAgreementImagePublicId)
+                {
+                    ResourceType = ResourceType.Image,
+                    Invalidate = true
+                };
 
-            student.StudentIdImagePath = $"/students/images/{newImageName}";
+                await _cloudinary.DestroyAsync(deleteParam);
+                var newMoaPath = await _cloudinaryService.UploadImage(file);
+                student.MemorandumOfAgreementImagePath = newMoaPath.ImageUrlPath;
+                student.MemorandumOfAgreementImagePublicId = newMoaPath.ImageId;
+                await _databaseContext.SaveChangesAsync();
+                return true;
+            }
+
+            var MoaPath = await _cloudinaryService.UploadImage(file);
+            student.MemorandumOfAgreementImagePath = MoaPath.ImageUrlPath;
+            student.MemorandumOfAgreementImagePublicId = MoaPath.ImageId;
+            await _databaseContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UploadProfilePicture(IFormFile file, int ProfileId)
+        {
+            var student = await _databaseContext.StudentRequirements.FirstOrDefaultAsync(i => i.StudentProfileId == ProfileId);
+
+            if (student == null)
+                return false;
+
+            if(student.StudentIdImagePath != null)
+            {
+                var delParams = new DeletionParams(student.StudentIdImagePublicId)
+                {
+                    Invalidate = true,
+                    ResourceType = ResourceType.Image,
+                };
+
+                await _cloudinary.DestroyAsync(delParams);
+
+                //new image
+                var newProfilePic = await _cloudinaryService.UploadImage(file);
+                student.StudentIdImagePath = newProfilePic.ImageUrlPath;
+                student.StudentIdImagePublicId = newProfilePic.ImageId;
+                await _databaseContext.SaveChangesAsync();
+                return true;
+            }
+
+            var ProfilePic = await _cloudinaryService.UploadImage(file);
+            student.StudentIdImagePath = ProfilePic.ImageUrlPath;
+            student.StudentIdImagePublicId = ProfilePic.ImageId;
             await _databaseContext.SaveChangesAsync();
             return true;
             
@@ -364,5 +290,51 @@ namespace Attendace_Tracking_Sytem.Repository
         {
             return await _databaseContext.StudentsProfile.FirstOrDefaultAsync(i => i.UserId == userId);
         }
+
+        public async Task<StudentApplication> StudentApplicationProcess(StudentApplicationDTO studentProfileDTO, string? extension)
+        {
+            StudentApplication application = new StudentApplication
+            {
+                FullName = studentProfileDTO.FullName,
+                Course = studentProfileDTO.Course,
+                Description = studentProfileDTO.Description,
+                Year = studentProfileDTO.Year,
+                School = studentProfileDTO.School,
+                ApplicationDate = DateTime.UtcNow,
+                Status = Enums.ApplicationStatus.Pending
+            };
+
+            if(studentProfileDTO.Resume != null)
+            {
+                var imageName = Guid.NewGuid().ToString() + extension;
+
+                //FOLDER
+                var folder = Path.Combine
+                (
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                "students",
+                "resumes"
+                );
+
+                //CREATE DIRECTOR IF NOT EXIST
+                Directory.CreateDirectory(folder);
+
+                var newResumePath = Path.Combine(folder, imageName);
+                using var stream = new FileStream(newResumePath,FileMode.Create);
+                await studentProfileDTO.Resume.CopyToAsync(stream);
+
+                application.ResumePath = $"/students/resumes/{newResumePath}";
+                await _databaseContext.StudentApplications.AddAsync(application);
+                await _databaseContext.SaveChangesAsync();
+                return application;
+            }
+
+            await _databaseContext.StudentApplications.AddAsync(application);
+            await _databaseContext.SaveChangesAsync();
+            return application;
+
+        }
+
     }
 }

@@ -20,6 +20,7 @@ namespace Attendace_Tracking_Sytem.Database
         public DbSet<MissedTimeouts> MissedTimeouts { get; set; }
         public DbSet<StudentRequirements> StudentRequirements { get; set; }
         public DbSet<DailyAttendanceReport> DailyAttendanceReports { get; set; }
+        public DbSet<StudentApplication> StudentApplications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -39,6 +40,10 @@ namespace Attendace_Tracking_Sytem.Database
 
             builder.Entity<StudentProfile>()
                 .Property(i => i.Department)
+                .HasConversion<string>();
+
+            builder.Entity<StudentApplication>()
+                .Property(i => i.Status)
                 .HasConversion<string>();
 
             builder.Entity<MissedTimeouts>().

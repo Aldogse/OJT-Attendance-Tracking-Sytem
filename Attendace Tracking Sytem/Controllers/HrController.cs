@@ -309,6 +309,20 @@ namespace Attendace_Tracking_Sytem.Controllers
             }
             return View();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> StudentApplications([FromQuery]int page = 1, [FromQuery]int size = 10)
+        {
+            var applicants = await _hrRepository.GetStudentApplicants(page,size);
+
+            if(applicants == null || applicants.Count <= 0)
+            {
+                TempData["Empty"] = "No applicants for this month!";
+                return View(applicants);
+            }
+
+            return View(applicants);
+        }
     }
 
 }
