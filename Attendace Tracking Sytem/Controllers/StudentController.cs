@@ -38,9 +38,10 @@ namespace Attendace_Tracking_Sytem.Controllers
             return View();
         }
 
-        public IActionResult Success()
+        public async Task<IActionResult> Success()
         {
             return View();
+            await Task.Delay(TimeSpan.FromSeconds(2));
         }
 
         [HttpGet]
@@ -85,7 +86,8 @@ namespace Attendace_Tracking_Sytem.Controllers
 
                 await _databaseContext.SaveChangesAsync();
                 
-                return RedirectToAction("Success","Student");            
+                return RedirectToAction("Success","Student"); 
+           
 
         }
 

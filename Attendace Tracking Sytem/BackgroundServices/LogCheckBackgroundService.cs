@@ -1,12 +1,12 @@
-﻿
-using Attendace_Tracking_Sytem.Database;
+﻿using Attendace_Tracking_Sytem.Database;
 using Attendace_Tracking_Sytem.Interface;
 using Attendace_Tracking_Sytem.Models.HR_RELATED_MODELS;
 using Attendace_Tracking_Sytem.Repository;
+using Attendace_Tracking_Sytem.Services;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Attendace_Tracking_Sytem.Services
+namespace Attendace_Tracking_Sytem.BackgroundServices
 {
     public class LogCheckBackgroundService : BackgroundService
     {
@@ -29,10 +29,18 @@ namespace Attendace_Tracking_Sytem.Services
                     using var scope = _serviceScope.CreateScope();
                     var repository = scope.ServiceProvider.GetRequiredService<IHrRepository>();
                     var database = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-                    DateTime now = DateTime.Now;
-                    DateTime nextDay = now.Date.AddDays(1);
 
-                    var delay = nextDay - now;
+                    //RUN EVERY 6PM 
+                    DateTime now = DateTime.UtcNow;
+                    DateTime nextRun = new DateTime(now.Year, now.Month, now.Day, 18, 0, 0);
+
+                    if (now.TimeOfDay > nextRun.TimeOfDay)
+                    {
+                        nextRun = nextRun.AddDays(1);
+                    }
+
+                    var delay = nextRun - now;
+
                     await LogBackgroundService(repository, database);
                     errCount = 0;
                     await Task.Delay(delay, stoppingToken);
@@ -58,7 +66,7 @@ namespace Attendace_Tracking_Sytem.Services
 
         private async Task LogBackgroundService(IHrRepository hrRepository,DatabaseContext database)
         {
-                //this should have .adddays + 1
+                
                 DateOnly date = DateOnly.FromDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day));
 
                 var missedTimeOuts = await hrRepository.MissedTimeOuts(date);

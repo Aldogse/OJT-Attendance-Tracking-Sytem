@@ -1,10 +1,10 @@
-﻿
-using Attendace_Tracking_Sytem.Database;
+﻿using Attendace_Tracking_Sytem.Database;
 using Attendace_Tracking_Sytem.Interface;
 using Attendace_Tracking_Sytem.Models.StudentProfiles;
+using Attendace_Tracking_Sytem.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace Attendace_Tracking_Sytem.Services
+namespace Attendace_Tracking_Sytem.BackgroundServices
 {
     public class AttendanceCheckerService : BackgroundService
     {

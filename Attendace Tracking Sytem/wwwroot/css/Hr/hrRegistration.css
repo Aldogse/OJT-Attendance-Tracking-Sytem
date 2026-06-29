@@ -1,0 +1,75 @@
+﻿
+body {
+    background: linear-gradient( rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88) ), url('https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.register-card {
+    width: 100%;
+    max-width: 520px;
+    border: none;
+    border-radius: 22px;
+    overflow: hidden;
+    background-color: rgba(255,255,255,0.96);
+    backdrop-filter: blur(10px);
+}
+
+.register-header {
+    background: linear-gradient( 90deg, #0f172a, #1d4ed8 );
+    padding: 30px;
+    text-align: center;
+}
+
+    .register-header h2 {
+        color: white;
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .register-header p {
+        color: rgba(255,255,255,0.8);
+        margin-top: 10px;
+    }
+
+.form-label {
+    font-weight: 600;
+    color: #334155;
+}
+
+.form-control {
+    border-radius: 12px;
+    padding: 14px;
+    border: 1px solid #cbd5e1;
+}
+
+    .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.25);
+    }
+
+.register-btn {
+    background: linear-gradient( 90deg, #2563eb, #1d4ed8 );
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: 0.3s ease;
+}
+
+    .register-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+    }
+
+.login-link a {
+    text-decoration: none;
+    font-weight: 600;
+}
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+

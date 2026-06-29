@@ -107,7 +107,11 @@ using (var scope = app.Services.CreateScope())
         app.UseHsts();
     }
 
-app.UseHttpsRedirection();
+if (app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseRouting();
 
 app.UseExceptionHandler(error =>

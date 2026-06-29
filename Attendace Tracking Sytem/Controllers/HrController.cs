@@ -95,12 +95,12 @@ namespace Attendace_Tracking_Sytem.Controllers
             {
                 account.ProfileCompleted = true;
                 await _databaseContext.SaveChangesAsync();
-                return RedirectToAction("Hr", "HrProfileCreated");
-                
+                return RedirectToAction("LoginPage","Account");
+
             }
 
             ModelState.AddModelError("","User cannot be found!");
-            return View(newProfile);
+            return RedirectToAction("LoginPage","Account");
 
 
        }
@@ -139,10 +139,17 @@ namespace Attendace_Tracking_Sytem.Controllers
                 return View();
             }
 
-            await _hrRepository.ApproveStudentWorkProfile(Id);
+            bool studApproval = await _hrRepository.ApproveStudentWorkProfile(Id);
+
+            if(studApproval)
+            {
+                _emailServices.sendEmailAsync(userEmail, "Approval Message",
+              "<h1>Hi your profile has been successfully approved<h1>");
+                return RedirectToAction("HrDashboard", "Hr");
+            }
 
              _emailServices.sendEmailAsync(userEmail,"Approval Message",
-                "<h1>Hi your profile has bee successfully approved<h1>");
+                "<h1>Hi your Application has been Rejected<h1>");
 
 
             return RedirectToAction("HrDashboard","Hr");
@@ -151,11 +158,8 @@ namespace Attendace_Tracking_Sytem.Controllers
         [HttpGet]
         public async Task<IActionResult> MissedLogDetails(int ProfileId)
         {
-
                 StudentMissedLogDetailsVM? studentData = await _hrRepository.MissTimeoutDetails(ProfileId);
-
                 return View(studentData);
-
         }
 
         [HttpPost]

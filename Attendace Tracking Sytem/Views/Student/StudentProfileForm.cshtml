@@ -1,131 +1,443 @@
-﻿@using Attendace_Tracking_Sytem.Enums
+﻿```cshtml
+@using Attendace_Tracking_Sytem.Enums
 @model Attendace_Tracking_Sytem.ViewModels.Student_Pages_VM.StudentProfileVM
 
 <!DOCTYPE html>
 
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Profile Setup</title>
 
-    
-    <!-- Bootstrap 5 CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Student Profile Setup
+    </title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+
+        body {
+            background: linear-gradient( rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85) ), url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .profile-card {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            background-color: rgba(255,255,255,0.98);
+            backdrop-filter: blur(6px);
+        }
+
+        .card-header-custom {
+            background-color: #0f172a;
+            padding: 32px;
+            border-bottom: 4px solid #1e293b;
+        }
+
+            .card-header-custom h3 {
+                color: white;
+                margin: 0;
+                font-weight: 700;
+            }
+
+            .card-header-custom p {
+                color: #cbd5e1;
+                margin-top: 10px;
+                margin-bottom: 0;
+                font-size: 15px;
+            }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 20px;
+            border-left: 4px solid #0f172a;
+            padding-left: 12px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            padding: 14px;
+            border: 1px solid #cbd5e1;
+            transition: all 0.2s ease;
+        }
+
+            .form-control:focus,
+            .form-select:focus {
+                border-color: #0f172a;
+                box-shadow: 0 0 0 0.15rem rgba(15, 23, 42, 0.15);
+            }
+
+        .submit-btn {
+            background-color: #0f172a;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+            .submit-btn:hover {
+                background-color: #1e293b;
+                transform: translateY(-1px);
+            }
+
+        .alert-danger {
+            border-radius: 10px;
+        }
+
+    </style>
 
 </head>
-<body class="bg-light">
 
-    <div class="container mt-5">
-        <div class="card shadow rounded-4">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">Student Profile Setup</h4>
-            </div>
+<body>
 
-            
-            <div class="card-body">
-                <div asp-validation-summary="All" class="text-danger"></div>
-                <form method="post" asp-action="StudentProfileForm" asp-controller="Student">
+    <div class="container py-5">
 
-                    <input  type= "hidden" asp-for="UserId" /> 
+        <div class="row justify-content-center">
 
-                    <!-- Student ID -->
-                    <div class="mb-3">
-                        <label asp-for="StudentId">Student ID</label>
-                        <input type="text" asp-for="StudentId" class="form-control" required maxlength="50">
-                        <span asp-validation-for="StudentId" class="text-danger"></span>
+            <div class="col-lg-10">
+
+                <div class="card profile-card shadow-lg">
+
+                    <!-- HEADER -->
+
+                    <div class="card-header-custom">
+
+                        <h3>
+
+                            <i class="bi bi-person-vcard-fill"></i>
+
+                            Student Profile Setup
+
+                        </h3>
+
+                        <p>
+
+                            Complete your internship and student profile information
+
+                        </p>
+
                     </div>
 
-                    <!-- School -->
-                    <div class="mb-3">
-                        <label class="form-label">School</label>
-                        <input type="text" asp-for="School" class="form-control" required maxlength="50">
-                        <span asp-validation-for="School" class="text-danger"></span>
-                    </div>
+                    <!-- BODY -->
 
-                    <!-- Work Details -->
-                    <div class="row">
-                        <!-- Work Details -->
-                        <div class="row">
+                    <div class="card-body p-5">
 
-                            <div class="col-md-4 mb-3">
-                                <label asp-for="Department" class="form-label"></label>
-
-                                <select asp-for="Department"
-                                        asp-items="Html.GetEnumSelectList<Departments>()"
-                                        class="form-select">
-
-                                    <option value="">-- Select Department --</option>
-
-                                </select>
-
-                                <span asp-validation-for="Department" class="text-danger"></span>
+                        @if (ViewData.ModelState.ErrorCount > 0)
+                        {
+                            <div asp-validation-summary="All"
+                                 class="alert alert-danger">
                             </div>
-                        </div>
+                        }
 
-                        <div class="col-md-4 mb-3">
-                            <label asp-for="StartDate" class="form-label">Start Date</label>
-                            <input type="date" asp-for="StartDate" class="form-control" required>
-                            <span asp-validation-for="StartDate" class="text-danger"></span>
-                        </div>
+                        <form method="post"
+                              asp-action="StudentProfileForm"
+                              asp-controller="Student">
 
-                        <div class="col-md-4 mb-3">
-                            <label asp-for="EndDate" class="form-label">End Date</label>
-                            <input type="date" asp-for="EndDate" class="form-control" required>
-                            <span asp-validation-for="EndDate" class="text-danger"></span>
-                        </div>
+                            <input type="hidden"
+                                   asp-for="UserId" />
+
+                            <!-- STUDENT INFO -->
+
+                            <div class="section-title">
+
+                                Student Information
+
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-md-6 mb-4">
+
+                                    <label asp-for="StudentId"
+                                           class="form-label">
+
+                                        Student ID
+
+                                    </label>
+
+                                    <input asp-for="StudentId"
+                                           class="form-control"
+                                           maxlength="50"
+                                           placeholder="Enter student ID">
+
+                                    <span asp-validation-for="StudentId"
+                                          class="text-danger">
+                                    </span>
+
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+
+                                    <label asp-for="School"
+                                           class="form-label">
+
+                                        School
+
+                                    </label>
+
+                                    <input asp-for="School"
+                                           class="form-control"
+                                           maxlength="50"
+                                           placeholder="Enter school name">
+
+                                    <span asp-validation-for="School"
+                                          class="text-danger">
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            <!-- INTERNSHIP DETAILS -->
+
+                            <div class="section-title">
+
+                                Internship Details
+
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-md-4 mb-4">
+
+                                    <label asp-for="Department"
+                                           class="form-label">
+
+                                        Department
+
+                                    </label>
+
+                                    <select asp-for="Department"
+                                            asp-items="Html.GetEnumSelectList<Departments>()"
+                                            class="form-select">
+
+                                        <option value="">
+                                            -- Select Department --
+                                        </option>
+
+                                    </select>
+
+                                    <span asp-validation-for="Department"
+                                          class="text-danger">
+                                    </span>
+
+                                </div>
+
+                                <div class="col-md-4 mb-4">
+
+                                    <label asp-for="StartDate"
+                                           class="form-label">
+
+                                        Start Date
+
+                                    </label>
+
+                                    <input asp-for="StartDate"
+                                           type="date"
+                                           class="form-control">
+
+                                    <span asp-validation-for="StartDate"
+                                          class="text-danger">
+                                    </span>
+
+                                </div>
+
+                                <div class="col-md-4 mb-4">
+
+                                    <label asp-for="EndDate"
+                                           class="form-label">
+
+                                        End Date
+
+                                    </label>
+
+                                    <input asp-for="EndDate"
+                                           type="date"
+                                           class="form-control">
+
+                                    <span asp-validation-for="EndDate"
+                                          class="text-danger">
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            <!-- PERSONAL INFO -->
+
+                            <div class="section-title">
+
+                                Personal Information
+
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-md-4 mb-4">
+
+                                    <label asp-for="Firstname"
+                                           class="form-label">
+
+                                        First Name
+
+                                    </label>
+
+                                    <input asp-for="Firstname"
+                                           class="form-control"
+                                           placeholder="Enter first name">
+
+                                    <span asp-validation-for="Firstname"
+                                          class="text-danger">
+                                    </span>
+
+                                </div>
+
+                                <div class="col-md-4 mb-4">
+
+                                    <label asp-for="MiddleName"
+                                           class="form-label">
+
+                                        Middle Name
+
+                                    </label>
+
+                                    <input asp-for="MiddleName"
+                                           class="form-control"
+                                           placeholder="Enter middle name">
+
+                                    <span asp-validation-for="MiddleName"
+                                          class="text-danger">
+                                    </span>
+
+                                </div>
+
+                                <div class="col-md-4 mb-4">
+
+                                    <label asp-for="LastName"
+                                           class="form-label">
+
+                                        Last Name
+
+                                    </label>
+
+                                    <input asp-for="LastName"
+                                           class="form-control"
+                                           placeholder="Enter last name">
+
+                                    <span asp-validation-for="LastName"
+                                          class="text-danger">
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            <!-- CONTACT INFO -->
+
+                            <div class="section-title">
+
+                                Contact Information
+
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-md-4 mb-4">
+
+                                    <label asp-for="Age"
+                                           class="form-label">
+
+                                        Age
+
+                                    </label>
+
+                                    <input asp-for="Age"
+                                           type="number"
+                                           class="form-control"
+                                           placeholder="Enter age">
+
+                                    <span asp-validation-for="Age"
+                                          class="text-danger">
+                                    </span>
+
+                                </div>
+
+                                <div class="col-md-8 mb-4">
+
+                                    <label asp-for="PhoneNumber"
+                                           class="form-label">
+
+                                        Phone Number
+
+                                    </label>
+
+                                    <input asp-for="PhoneNumber"
+                                           class="form-control"
+                                           placeholder="Enter phone number">
+
+                                    <span asp-validation-for="PhoneNumber"
+                                          class="text-danger">
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            <!-- SUBMIT -->
+
+                            <div class="d-grid mt-4">
+
+                                <button type="submit"
+                                        class="btn btn-primary submit-btn">
+
+                                    <i class="bi bi-check-circle-fill"></i>
+
+                                    Submit Profile
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
                     </div>
 
-                    <!-- Name Row -->
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">First Name</label>
-                            <input type="text" asp-for="Firstname" class="form-control" required maxlength="50">
-                            <span asp-validation-for="Firstname" class="text-danger"></span>
-                        </div>
+                </div>
 
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Middle Name</label>
-                            <input type="text" asp-for="MiddleName" class="form-control" required maxlength="50">
-                            <span asp-validation-for="MiddleName" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Last Name</label>
-                            <input type="text" asp-for="LastName" class="form-control" required maxlength="50">
-                            <span asp-validation-for="LastName" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <!-- Age -->
-                    <div class="mb-3">
-                        <label class="form-label">Age</label>
-                        <input type="number" asp-for="Age" class="form-control" required min="1">
-                        <span asp-validation-for="Age" class="text-danger"></span>
-                    </div>
-
-
-                    <!-- Phone Number -->
-                    <div class="mb-3">
-                        <label class="form-label">Phone Number</label>
-                        <input type="text" asp-for="PhoneNumber" class="form-control" required>
-                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                    </div>
-
-                    <!-- Submit -->
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-success">
-                            Submit Profile
-                        </button>
-                    </div>
-
-                </form>
             </div>
+
         </div>
-        
 
     </div>
 
 </body>
+
 </html>
+```

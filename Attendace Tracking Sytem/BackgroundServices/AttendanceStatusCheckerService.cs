@@ -1,9 +1,9 @@
-﻿
-using Attendace_Tracking_Sytem.Database;
+﻿using Attendace_Tracking_Sytem.Database;
 using Attendace_Tracking_Sytem.Interface;
+using Attendace_Tracking_Sytem.Services;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
-namespace Attendace_Tracking_Sytem.Services
+namespace Attendace_Tracking_Sytem.BackgroundServices
 {
     public class AttendanceStatusCheckerService : BackgroundService
     {

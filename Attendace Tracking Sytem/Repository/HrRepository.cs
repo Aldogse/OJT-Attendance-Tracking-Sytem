@@ -38,7 +38,7 @@ namespace Attendace_Tracking_Sytem.Repository
 
         }
 
-        public async Task ApproveStudentWorkProfile(int Id)
+        public async Task<bool> ApproveStudentWorkProfile(int Id)
         {
             var student = new StudentProfile { ProfileId = Id };
 
@@ -57,6 +57,7 @@ namespace Attendace_Tracking_Sytem.Repository
 
             await _databaseContext.StudentRequirements.AddAsync(requirements);
             await _databaseContext.SaveChangesAsync();
+            return true;
         }
 
         public Task DenyStudentWorkProfile(int Id)
